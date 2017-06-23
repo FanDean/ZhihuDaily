@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/zhihu_item_height"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
+              android:background="?android:attr/selectableItemBackground"
+              android:padding="@dimen/zhihu_item_padding">
+
+    <!-- android:background="?android:attr/selectableItemBackground" 属性的使用，为item添加选中时的效果 -->
+
+    <TextView
+        android:id="@+id/zhihu_item_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textSize="@dimen/zhihu_item_title"
+        tools:hint="标题文字"/>
+
+    <ImageView
+        android:id="@+id/zhihu_item_imageview"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        tools:background="@android:color/holo_blue_dark"/>
+
+</LinearLayout>

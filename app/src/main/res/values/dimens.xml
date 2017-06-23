@@ -1,0 +1,37 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!-- 首页 -->
+    <!-- 知乎List-->
+    <dimen name="zhihu_item_height">96dp</dimen>
+    <dimen name="zhihu_item_padding">8dp</dimen>
+    <dimen name="zhihu_item_margin">6dp</dimen>
+    <dimen name="zhihu_item_title">18sp</dimen>
+
+    <!-- 豆瓣CardView -->
+    <dimen name="item_offset">10dp</dimen>
+    <dimen name="detail_backdrop_height">250dp</dimen>
+    <dimen name="backdrop_title">30dp</dimen>
+    <dimen name="backdrop_subtitle">18dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
+    <dimen name="card_movie_radius">0dp</dimen>
+    <dimen name="movie_cover_height">240dp</dimen>
+    <dimen name="movie_title_padding">10dp</dimen>
+    <dimen name="movie_title">15dp</dimen>
+    <dimen name="rate_padding_bottom">5dp</dimen>
+    <dimen name="rate">12sp</dimen>
+    <dimen name="ic_movie_bookmark_width">20dp</dimen>
+    <dimen name="ic_movie_bookmark_height">30dp</dimen>
+    <dimen name="ic_movie_bookmark_margin_top">10dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="content_app_bar_height">240dp</dimen>
+
+
+</resources>
