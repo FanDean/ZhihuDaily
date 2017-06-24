@@ -22,7 +22,6 @@ import com.fandean.zhihudaily.bean.ZhihuNews;
 import com.fandean.zhihudaily.db.MyBaseHelper;
 import com.fandean.zhihudaily.db.ZhihuNewsLab;
 import com.fandean.zhihudaily.util.DateUtil;
-import com.fandean.zhihudaily.util.DbUtil;
 import com.fandean.zhihudaily.util.HttpUtil;
 import com.fandean.zhihudaily.util.MyApiEndpointInterface;
 import com.fandean.zhihudaily.util.NetworkState;
@@ -77,20 +76,6 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mUnbinder = ButterKnife.bind(this,view);
 
         mdb = new MyBaseHelper(getActivity()).getWritableDatabase();
-        //尝试从数据库获取当天的ZhihuNews。
-//        mZhihuNewsLab = ZhihuNewsLab.get(getActivity());
-//        mZhihuNewsList = mZhihuNewsLab.getZhihuNewsList();
-//        if (mZhihuNewsList != null){
-//            ZhihuNews zhihuNews = mZhihuNewsList.get(0);
-//            if (zhihuNews != null){
-//                mStoriesBeanList.addAll(zhihuNews.getStories());
-//                if (mStoriesBeanList == null){
-//                    mStoriesBeanList = new ArrayList<>();
-//                }
-//            }
-//        } else {
-//            mZhihuNewsList = new ArrayList<>();
-//        }
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(manager);
@@ -111,6 +96,12 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mClient = HttpUtil.getRetrofitClient(getActivity(),HttpUtil.ZHIHU_BASE_URL);
 
+
+        //设置颜色
+        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         mRefreshLayout.setOnRefreshListener(this);
         //下拉刷新
         mRefreshLayout.post(new Runnable() {
@@ -149,13 +140,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 }
 
                 ZhihuNews zhihuNews = response.body();
-                //内存中的List数据是否过期
-                //出现的一种情况是，当从豆瓣返回后，知乎日报中的
-//                if (!Utility.isExpired(ZhihuNewsLab.get(getActivity()).getRefreshTime())) {
-//                        //没有过期
-//                        mRefreshLayout.setRefreshing(false);
-//                        return;
-//                }
+
                 //刷新成功
                 Log.d(FAN_DEAN, "刷新数据：" + zhihuNews.getDate());
                 refreshSuccess(zhihuNews);
@@ -175,13 +160,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             Toast.makeText(getActivity(),"获取数据失败",Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getActivity(),"请检查网络连接",Toast.LENGTH_SHORT).show();
-            //加载历史数据
-//            List<ZhihuNews> zhihuNewsList = mZhihuNewsLab.getZhihuNewsList();
-//            if (zhihuNewsList != null) {
-//                mZhihuNewsList.clear();
-//                mZhihuNewsList.addAll(zhihuNewsList);
-//                mStoriesBeanList.addAll(mZhihuNewsList.get(0).getStories());
-//                mAdapter.notifyItemInserted(0);}
+
         }
         mRefreshLayout.setRefreshing(false);
     }
@@ -191,18 +170,6 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         GregorianCalendar calendar = new GregorianCalendar();
         ZhihuNewsLab.get(getActivity()).setRefreshTime(calendar.getTimeInMillis());
 
-        //添加到第一个位置
-//        mZhihuNewsList.add(0,zhihuNews);
-
-        //TODO 考虑是否需要先清空StoriesBeanList，再之后进行上拉加载时刷新
-//        mStoriesBeanList.clear(); //必须删除，否则内存中存在大量重复数据
-//        //通知数据变更
-//        mStoriesBeanList.addAll(0,zhihuNews.getStories());
-        //通知有新数据插入
-//        mAdapter.notifyItemInserted(0);
-//        mAdapter.notifyItemRangeChanged(0,zhihuNews.getStories().size());
-        //该方法只作为最后手段，但是在这里既然已经清空并重新添加了数据，可以考虑使用
-//        mAdapter.notifyDataSetChanged();
 
         mAdapter.clear();
         mAdapter.addAll(zhihuNews.getStories());
@@ -213,7 +180,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         ZhihuNewsLab.setBaseTime(GregorianCalendar.getInstance().getTimeInMillis());
         //插入到数据库
         //        mZhihuNewsLab.insertZhihuNews(zhihuNews);
-        DbUtil.insertZhihuNews(mdb,zhihuNews);
+//        DbUtil.insertZhihuNews(mdb,zhihuNews);
     }
 
     /**
@@ -271,16 +238,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onRefresh() {
-        //确保刷新间隔在5秒之内
-        GregorianCalendar calendar = new GregorianCalendar();
-        long timeInterval = calendar.getTimeInMillis() - mRefreshTimeInterval;
-        timeInterval = timeInterval/1000;  //从毫秒 --> 秒
-        if (timeInterval >= 5) {
-            mRefreshTimeInterval = timeInterval;
-            fetchLatestZhihuNews();
-        }
-        mRefreshTimeInterval = timeInterval;
-        Log.d(FAN_DEAN, "刷新间隔小于5，不获取数据");
+        fetchLatestZhihuNews();
     }
 
 

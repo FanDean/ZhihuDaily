@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -30,12 +31,13 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 import static com.fandean.zhihudaily.R.id.fab;
 
 public class ZhihuActivity extends AppCompatActivity {
     private static final String EXTRA_ID = "com.fandean.zhihudaily.newid";
+    private static final String EXTRA_TITLE = "com.fandean.zhihudaily.newtitle";
+    private static final String EXTRA_IMAGE_URL = "com.fandean.zhihudaily.newimageurl";
     @BindView(R.id.content_image)
     ImageView mImageView;
     @BindView(R.id.toolbar)
@@ -51,9 +53,9 @@ public class ZhihuActivity extends AppCompatActivity {
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
     private int mId;
+    private String mTitle = "知乎日报";
+    private String mImageUrl;
 
-
-    private Retrofit mRetrofit;
     private MyApiEndpointInterface mClient;
 
     @Override
@@ -65,8 +67,19 @@ public class ZhihuActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //获取传入的数据，设置标题、加载头部图片、mId用于获取新闻
+        Intent intent = getIntent();
+        if (!TextUtils.isEmpty(intent.getStringExtra(EXTRA_TITLE))){
+            mId = intent.getIntExtra(EXTRA_ID, 0);
+            mTitle = intent.getStringExtra(EXTRA_TITLE);
+            mImageUrl = intent.getStringExtra(EXTRA_IMAGE_URL);
+        }
+        mToolbarLayout.setTitle(mTitle);
+        Glide.with(this)
+                .load(mImageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(mImageView);
 
-        mId = getIntent().getIntExtra(EXTRA_ID, 0);
 
         mClient = HttpUtil.getRetrofitClient(this,HttpUtil.ZHIHU_BASE_URL);
 
@@ -92,12 +105,6 @@ public class ZhihuActivity extends AppCompatActivity {
 
 
     private void fetchZhihuStory() {
-//        mRetrofit = new Retrofit.Builder() //新建一个构建器来设置参数
-//                .baseUrl("https://news-at.zhihu.com/api/4/news/")
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build(); //构建器的此方法生成Retrofit对象
-//        mClient = mRetrofit.create(MyApiEndpointInterface.class);
-
         Call<ZhihuStory> call = mClient.getZhihuStory(mId);
         call.enqueue(new Callback<ZhihuStory>() {
             @Override
@@ -108,6 +115,7 @@ public class ZhihuActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    mProgressBar.setVisibility(View.GONE);
                     return;
                 }
                 ZhihuStory story = response.body();
@@ -116,10 +124,18 @@ public class ZhihuActivity extends AppCompatActivity {
                         .load(story.getImage())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(mImageView);
+                String htmlData = story.getBody();
+
+
+
+                htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"zhihu_daily.css\" />" + htmlData;
+                // lets assume we have /assets/style.css file
+                mWebview.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+
 
                 //使用该方法加载中文页面会乱码
 //                mWebview.loadData(story.getBody(),"text/html","utf-8");
-                mWebview.loadDataWithBaseURL(null,story.getBody(),"text/html","utf-8",null);
+//                mWebview.loadDataWithBaseURL(null,story.getBody(),"text/html","utf-8",null);
 //                Log.d("FanDean","成功获取页面： " + story.getTitle());
                 //隐藏并不保留progressBar占用的空间
                 mProgressBar.setVisibility(View.GONE);
@@ -127,15 +143,17 @@ public class ZhihuActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ZhihuStory> call, Throwable t) {
-
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
 
 
-    public static Intent newIntent(Context pakageContext, int id) {
+    public static Intent newIntent(Context pakageContext, int id,String title,String imageUrl) {
         Intent i = new Intent(pakageContext, ZhihuActivity.class);
         i.putExtra(EXTRA_ID, id);
+        i.putExtra(EXTRA_TITLE,title);
+        i.putExtra(EXTRA_IMAGE_URL,imageUrl);
         return i;
     }
 }

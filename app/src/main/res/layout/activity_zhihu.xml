@@ -22,6 +22,7 @@
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            <!--app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">-->
 
             <RelativeLayout
                 android:layout_width="match_parent"

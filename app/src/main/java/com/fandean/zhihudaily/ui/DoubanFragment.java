@@ -36,12 +36,13 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
+{
     public static final String FAN_DEAN = MainActivity.FAN_DEAN;
     @BindView(R.id.douban_recyclerview)
     RecyclerView mDoubanRecyclerview;
     @BindView(R.id.douban_swiprefresh)
-    SwipeRefreshLayout mRefreshLayout;
+    SwipeRefreshLayout mSwipeRefreshLayout;
     Unbinder unbinder;
     private final int COLUMN = 2;
 
@@ -76,11 +77,18 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         mDoubanRecyclerview.setAdapter(mAdapter);
 
+        //设置颜色
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        //记得设置监听器，否则不会调用Refresh()
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mRefreshLayout.post(new Runnable() {
+        mSwipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                mRefreshLayout.setRefreshing(true);
+                mSwipeRefreshLayout.setRefreshing(true);
                 fetchDoubanMovieList();
             }
         });
@@ -116,7 +124,7 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 mAdapter.clear();
                 mAdapter.addAll(mMovieInTheaters.getSubjects());
 
-                mRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -135,18 +143,18 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
             Toast.makeText(getActivity(),"请检查网络连接",Toast.LENGTH_SHORT).show();
             //不保存历史数据
         }
-        mRefreshLayout.setRefreshing(false);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        Log.d(FAN_DEAN,"豆瓣列表的Fragment的onDestroyView()");
     }
 
     @Override
     public void onRefresh() {
         fetchDoubanMovieList();
-        mRefreshLayout.setRefreshing(false);
     }
 }

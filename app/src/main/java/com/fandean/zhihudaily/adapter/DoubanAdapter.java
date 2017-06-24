@@ -106,7 +106,9 @@ public class DoubanAdapter extends RecyclerView.Adapter<DoubanAdapter.DoubanHold
         @Override
         public void onClick(View v) {
             Log.d("FanDean","点击了豆瓣电影：" + mSubjectsBean.getTitle());
-            mContext.startActivity(DoubanActivity.newIntent(mContext,mSubjectsBean.getId(),mSubjectsBean.getImages().getLarge()));
+            mContext.startActivity(DoubanActivity.newIntent(mContext,
+                    mSubjectsBean.getId(),mSubjectsBean.getImages().getLarge(),
+                    mSubjectsBean.getTitle()));
         }
     }
 }

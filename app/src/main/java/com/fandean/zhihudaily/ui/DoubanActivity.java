@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -16,6 +17,8 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.bean.DoubanMovie;
 import com.fandean.zhihudaily.util.HttpUtil;
@@ -32,7 +35,8 @@ import retrofit2.Retrofit;
 
 public class DoubanActivity extends AppCompatActivity {
     private static final String EXTRA_ID = "com.fandean.zhihudaily.douban_id";
-    private static final String IMAGE_URL = "com.fandean.zhihudaily.image_url";
+    private static final String EXTRA_TITLE = "com.fandean.zhihudaily.douban_title";
+    private static final String EXTRA_IMAGE_URL = "com.fandean.zhihudaily.douban_mageurl";
     @BindView(R.id.content_image)
     ImageView mContentImage;
     @BindView(R.id.toolbar)
@@ -50,6 +54,7 @@ public class DoubanActivity extends AppCompatActivity {
 
     private String mId;
     private String mImageUrl;
+    private String mTitle = "豆瓣电影";
 
     private Retrofit mRetrofit;
     private MyApiEndpointInterface mClient;
@@ -64,8 +69,16 @@ public class DoubanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        mId = intent.getStringExtra(EXTRA_ID);
-        mImageUrl = intent.getStringExtra(IMAGE_URL);
+        if (!TextUtils.isEmpty(intent.getStringExtra(EXTRA_TITLE))){
+            mId = intent.getStringExtra(EXTRA_ID);
+            mImageUrl = intent.getStringExtra(EXTRA_IMAGE_URL);
+            mTitle = intent.getStringExtra(EXTRA_TITLE);
+        }
+        mToolbarLayout.setTitle(mTitle);
+        Glide.with(this)
+                .load(mImageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(mContentImage);
 
         mClient = HttpUtil.getRetrofitClient(this,HttpUtil.DOUBSN_BASE_URL);
 
@@ -88,12 +101,6 @@ public class DoubanActivity extends AppCompatActivity {
     }
 
     private void fetchDoubanMovie(){
-//        mRetrofit = new Retrofit.Builder()
-//                .baseUrl("https://api.douban.com/v2/movie/")
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//        mClient = mRetrofit.create(MyApiEndpointInterface.class);
-
         //创建接口实例
         Call<DoubanMovie> call = mClient.getDoubanMovie(Integer.parseInt(mId));
         call.enqueue(new Callback<DoubanMovie>() {
@@ -104,6 +111,7 @@ public class DoubanActivity extends AppCompatActivity {
                         Log.e("FanDean", response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
+                        mProgressBar.setVisibility(View.GONE);
                     }
                     return;
                 }
@@ -116,7 +124,7 @@ public class DoubanActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DoubanMovie> call, Throwable t) {
-
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -124,10 +132,11 @@ public class DoubanActivity extends AppCompatActivity {
 
 
 
-    public static Intent newIntent(Context context, String id, String imageUrl) {
+    public static Intent newIntent(Context context, String id, String imageUrl,String title) {
         Intent i = new Intent(context, DoubanActivity.class);
         i.putExtra(EXTRA_ID, id);
-        i.putExtra(IMAGE_URL, imageUrl);
+        i.putExtra(EXTRA_IMAGE_URL, imageUrl);
+        i.putExtra(EXTRA_TITLE,title);
         return i;
     }
 }

@@ -101,7 +101,8 @@ public class ZhihuAdapter extends RecyclerView.Adapter<ZhihuAdapter.ZhihuHolder>
         @Override
         public void onClick(View v) {
 //            Toast.makeText(mContext, mStory.getTitle() + "被点击",Toast.LENGTH_SHORT).show();
-            mContext.startActivity(ZhihuActivity.newIntent(mContext, mStory.getId()));
+            mContext.startActivity(ZhihuActivity.newIntent(mContext,
+                    mStory.getId(),mStory.getTitle(),mStory.getImages().get(0)));
 //            ZhihuNewsLab.get(mContext).getZhihuNews("20170620");
         }
     }

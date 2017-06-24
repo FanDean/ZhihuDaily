@@ -54,6 +54,11 @@ Background Color颜色,不建议直接使用一般的颜色值，这个属性的
 
 ## RecyclerView
 
+[深入浅出 RecyclerView|开源实验室-张涛](https://www.kymjs.com/code/2016/07/10/01/ "深入浅出 RecyclerView|开源实验室-张涛")
+
+
+
+
 通知在列表的末尾添加了插入了多个项目：
 ```
 int curSize = adapter.getItemCount();
@@ -103,10 +108,23 @@ In order for the pagination system to continue working reliably, you should make
 上拉加载的日期参考值是当天，导致重选日期后加载的数据是从当天的第二天开始。
 
 
+
+
+## RecyclerView手动移除列表项
+
+[Android RecyclerView, Android CardView Example Tutorial - JournalDev](http://www.journaldev.com/10024/android-recyclerview-android-cardview-example-tutorial "Android RecyclerView, Android CardView Example Tutorial - JournalDev")
+
+
+
 ### RecycleView其他
 
 - 为Item按下时显示一个“选择”的效果，
 我们可以item的布局文件中为根布局设置`android:background`的属性值为`?android:attr/selectableItemBackground`
+
+
+
+
+
 
 
 ## SwipeRefreshLayout
@@ -140,9 +158,110 @@ Troubleshooting 故障排查：
 
 
 
+进阶：
+
+[hanks-zyh/SwipeRefreshLayout: 谷歌的下拉刷新，新的界面效果](https://github.com/hanks-zyh/SwipeRefreshLayout "hanks-zyh/SwipeRefreshLayout: 谷歌的下拉刷新，新的界面效果")
+
+
+
+```
+// 设置下拉圆圈上的颜色，蓝色、绿色、橙色、红色
+mySwipeRefreshLayout.setColorSchemeResources(
+    android.R.color.holo_blue_bright,
+    android.R.color.holo_green_light,
+    android.R.color.holo_orange_light,
+    android.R.color.holo_red_light);
+
+// 通过 setEnabled(false) 禁用下拉刷新
+mySwipeRefreshLayout.setEnabled(false);
+
+// 设定下拉圆圈的背景
+mSwipeLayout.setProgressBackgroundColor(R.color.red);
+
+```
+
+通过 `setRefreshing(false)` 和 `setRefreshing(true)` 来手动调用刷新的动画。
+
+onRefresh 的回调只有在手势下拉的情况下才会触发，通过 setRefreshing 只能调用刷新的动画是否显示。
+
+SwipeRefreshLayout 也可放在 CoordinatorLayout 内共同处理滑动冲突，有兴趣可以尝试。
+
+
+前面提到我们自己调用 setRefresh(true) 只能产生动画，而不能回调刷新函数
+
+
+当SwipeRefreshLayout包含一个子控件和一个子ListView，两个子控件的时候的处理，见：
+
+[Android SwipeRefreshLayout Tutorial](https://www.survivingwithandroid.com/2014/05/android-swiperefreshlayout-tutorial-2.html "Android SwipeRefreshLayout Tutorial")
+
+思路是，对ListView的滚动进行监听，只有当第一个列表项可见的时候才启用SwipeRefreshLayout。
+
+
+经常见到
+
+```
+//在onRefresh()中使用如下方法进行延时。
+//延迟处理程序  a post delayed handler
+@Override public void onRefresh() {
+    new Handler().postDelayed(new Runnable() {
+        @Override public void run() {
+            swipeLayout.setRefreshing(false);
+        }
+    }, 5000);
+```
+
+```
+ int cnt = swiperefresh.getChildCount();
+                            for(int i=0; i<cnt; i++) {
+                                View ch = swiperefresh.getChildAt(i);
+                                if(ch.getClass().getSimpleName().equals("CircleImageView")) {
+                                    ch.clearAnimation();
+                                    ch.setVisibility(View.GONE);
+                                    swiperefresh.setRefreshing(false);
+                                    ch.clearAnimation();
+                                    break;
+                                }
+                            }
+
+```
+
+
+### SwipeRefreshLayout的问题
+
+原因：Refresh()方法无法调用。
+
+排除：子RecyclerView的关系
+
+预测：和协调员CoordinatorLayout有关； 或者和ViewPager有关。
+
+在新建的测试项目中，两个Tab中的SwipeRefreshLayout都无法调用 Refresh()方法；而知乎这个项目只有豆瓣电影那边无法调用。
+
+处理过程：
+
+- 调试程序，调试技术菜，没找出来为什么没有调用Refresh()。
+- 查找SwipeRefreshLayout的用法
+- 查找是否有类似错误。 没有
+- 新建一个项目测试，是否是和CoordinatorLayout有关。新项目复制了部分此项目的代码。无果。
+- 修改代码，有带来许多新问题。why？？？
+- 绝望之际，根据新情况，难道两个Fragment都这样设置监听器会有冲突？那让它以匿名内部类的形式实现监听器吧！
+- 发现问题了，原来我个SB连监听器都没有给它添加进去，叫他怎么调用。
+
+
+
+
 ## CardView
 
 TODO CardView的点击效果还没有实现。
+
+由于之前为CardView和Image设置了如下两项，但又没有为它们设置监听器，
+所以截获了点击，点击无法传递给底部的LineaLayout。
+```
+android:clickable="true"
+android:focusable="true"
+```
+
+
+
 
 
 ## 日期的格式化
@@ -356,9 +475,263 @@ mProgressBar.setVisibility(View.GONE);
 
 
 
+## CollapsingToolbarLayout
+
+```
+    //使用CollapsingToolbarLayout必须把title设置到CollapsingToolbarLayout上，设置到Toolbar上则不会显示
+        CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
+        mCollapsingToolbarLayout.setTitle("test");
+        //通过CollapsingToolbarLayout修改字体颜色
+        mCollapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);//设置还没收缩时状态下字体颜色
+        mCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.GREEN);
+
+```
+
+相关配置的作用见：
+
+[Material Design之CollapsingToolbarLayout使用 - 【博客地址永久迁移到】：http://zhengxiaoyong.me - 博客频道 - CSDN.NET](http://blog.csdn.net/u010687392/article/details/46906657 "Material Design之CollapsingToolbarLayout使用 - 【博客地址永久迁移到】：http://zhengxiaoyong.me - 博客频道 - CSDN.NET")
+
+
+
+## WebView
+高性能 webkit 内核浏览器。
+
+两篇不错的文章，另还可参考《Android编程权威指南》
+
+[深入讲解WebView——上|开源实验室-张涛](https://www.kymjs.com/code/2015/05/03/01/ "深入讲解WebView——上|开源实验室-张涛")
+
+[Android开发：最全面、最易懂的Webview使用详解 - 简书](http://www.jianshu.com/p/3c94ae673e2a# "Android开发：最全面、最易懂的Webview使用详解 - 简书")
+
+
+
+### WebView保存状态
+
+You can save the Webview in Android Cache : Use WebView Setting
+```
+//表示优先使用缓存
+webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+```
+
+
+### WebView的缓存
+
+在项目中如果使用到 WebView 控件,当加载 html 页面时,会在/data/data/包名目录下生成 database 与 cache 两个文件夹（我的手机没有root，就不截图了）。
+请求的 url 记录是保存在 WebViewCache.db,而 url 的内容是保存在 WebViewCache 文件夹下.
+
+
+### CSS注入、加载本地CSS
+
+loadDataWithBaseURL(String baseUrl, String data, String mimeType, String encoding, String historyUrl)
+
+该方法是loadData(...)的增强版，它不会产生乱码。
+
+- data: 指定需要加载的HTML代码
+- mimeType :指定HTML代码的MIME类型，对于HTML代码可以指定为text/html
+- encoding: 指定HTML代码编码所采用的字符集
+
+使用示例：` mWebView.loadDataWithBaseURL(null, sb.toString(), "text/html", "utf-8", null);`
+
+
+方法一：直接在现有html数据之前添加一段导入css的标签
+
+
+> 方法一和方法二都参考了：
+[android - Rendering（渲染 HTML in a WebView with custom CSS - Stack Overflow](https://stackoverflow.com/questions/4950729/rendering-html-in-a-webview-with-custom-css "android - Rendering HTML in a WebView with custom CSS - Stack Overflow")
+
+
+```
+htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + htmlData;
+// lets assume we have /assets/style.css file
+webView.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+```
+
+And only after that WebView will be able to find and use css-files from the assets directory.
+
+ps： And, yes, if you load your html-file form the assets folder, you don't need to specify a base url.
+
+
+方法二：使用jsoup库
+
+[jsoup Java HTML Parser, with best of DOM, CSS, and jquery](https://jsoup.org/ "jsoup Java HTML Parser, with best of DOM, CSS, and jquery")
+
+[Cookbook: jsoup Java HTML parser](https://jsoup.org/cookbook/ "Cookbook: jsoup Java HTML parser")
+
+jsoup: Java HTML Parser
+
+```
+// jsoup HTML parser library @ https://jsoup.org/
+compile 'org.jsoup:jsoup:1.10.3'
+```
+
+看起来很简单：一个简单示例，
+```
+Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
+Elements newsHeadlines = doc.select("#mp-itn b a");
+```
+
+```
+//1. load the web-page with jsoup:
+doc = Jsoup.connect("http://....").get();
+
+//2. remove links to external style-sheets
+doc.head().getElementsByTag("link").remove();
+
+//3. set link to local stylesheet。假设文件在assets文件夹,文件名为 style.css
+// <link rel="stylesheet" type="text/css" href="style.css" />
+doc.head().appendElement("link").attr("rel", "stylesheet").attr("type", "text/css").attr("href", "style.css");
+
+//4.make string from jsoup-doc/web-page:
+String htmldata = doc.outerHtml();
+
+5. display web-page in webview:
+WebView webview = new WebView(this);
+setContentView(webview);
+webview.loadDataWithBaseURL("file:///android_asset/.", htmlData, "text/html", "UTF-8", null);
+```
+
+
+> 方法三的参考： [inject CSS to a site with webview in android - Stack Overflow](https://stackoverflow.com/questions/30018540/inject-css-to-a-site-with-webview-in-android "inject CSS to a site with webview in android - Stack Overflow")
+
+方法三，使用JS操作DOM：
+
+```
+public class MainActivity extends ActionBarActivity {
+
+  WebView webView;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    webView = new WebView(this);
+    setContentView(webView);
+
+    // Enable Javascript
+    webView.getSettings().setJavaScriptEnabled(true);
+
+    // Add a WebViewClient
+    webView.setWebViewClient(new WebViewClient() {
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+
+            // Inject CSS when page is done loading
+            injectCSS();
+            super.onPageFinished(view, url);
+        }
+    });
+
+    // Load a webpage
+    webView.loadUrl("https://www.google.com");
+}
+
+// Inject CSS method: read style.css from assets folder
+// Append stylesheet to document head
+private void injectCSS() {
+    try {
+        InputStream inputStream = getAssets().open("style.css");
+        byte[] buffer = new byte[inputStream.available()];
+        inputStream.read(buffer);
+                inputStream.close();
+                String encoded = Base64.encodeToString(buffer, Base64.NO_WRAP);
+                webView.loadUrl("javascript:(function() {" +
+                        "var parent = document.getElementsByTagName('head').item(0);" +
+                        "var style = document.createElement('style');" +
+                        "style.type = 'text/css';" +
+                        // Tell the browser to BASE64-decode the string into your script !!!
+                        "style.innerHTML = window.atob('" + encoded + "');" +
+                        "parent.appendChild(style)" +
+                        "})()");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+```
+
+但是这里的代码和方法可能有些问题，Stack Overflow上的讨论。
+
+Use DOM manipulation before loading Url in webview. By doing so you can inject any script or javascript file at runtime and then load the content into webview.I have been doing so in my ePub player and it works like charm
+
+
+另一个示例：
+
+```
+private void carregaCSS() {
+        final String extraStyles;
+        extraStyles= "javascript: "
+        + "function css(){ "
+            + " document.querySelectorAll('div.live-search-container')[0].style.display = 'none';"
+            + " document.querySelectorAll('div#top-bar')[0].style.display = 'none';"
+            + " document.querySelectorAll('span#btn-mobile-toggle')[0].style.display = 'none';"
+            + " document.querySelectorAll('div#cart')[0].style.display = 'none';"
+            + " document.querySelectorAll('div.col-md-7')[0].style.display = 'none';"
+            + " document.querySelectorAll('div.breadcrumb')[0].style.display = 'none';"
+        + "}"
+        +"css();"
+
+        +"";
+        mWebView.loadUrl(extraStyles);
+        }
+}
+```
+
+好吧这里我想问的是可以在同一个WebView中多次使用loadUrl加载多个资源吗？？莫非上面是先加载了html页面，再加载该JS代码？？
+
+
+
+### JS调用Android方法：
+
+在WebView的JavaScript中调用Android方法的步骤：
+
+- 调用WebSettings的setJavaScriptEnabled(true)启用JS调用功能
+- 调用WebView的addJavascriptInterface(Object object, String name)方法将object对象保留给JS脚本
+- 在JS脚本中通过刚才暴露的name对象调用Android方法。
+
+```
+//Activity中：
+
+mWebView.getSettings().setJavaScriptEnabled(true);
+mWebView.addJavascriptInterface(new MyObject(this), "myObj");
+
+
+//MyObject是自定义的java类，代码如下：
+public class MyObject{
+    Context mContext;
+    ...
+
+    //该注解表示该方法会暴露给JS脚本调用
+    @JavascriptInterface
+    public void showToast(String name){
+        Toast.makeText(...).show();
+    }
+
+    @JavascriptInterface
+    public void showList(){
+        ...
+    }
+}
+```
+
+HTML页面对应的JS代码：
+
+```
+...
+<body>
+    <input type="button" value"打招呼"
+        onclick="myObj.showToast('孙悟空');" />
+    <input type="button" value="图书列表"
+        onclick="myObj.showList();" />
+</body>
+...
+```
+
+
+
+
+
 
 ## TODO
-TODO CardView的点击效果还没有实现。
+~~TODO CardView的点击效果还没有实现。~~
 
 配置变更后，回到之前的列表位置。
 
@@ -366,7 +739,13 @@ TODO CardView的点击效果还没有实现。
 
 收藏夹排序问题，数据表中添加自动增长的主键，读取时倒序读取，并在读取时考虑使用分页读取。
 
-豆瓣列表的分页读取，每次读取显示10个项目。
+~~豆瓣列表的分页读取，每次读取显示10个项目。~~ 略，因为实现了网络缓存。
+
+WebView加载css
+
+设置界面功能：
+
+- 删除缓存功能：删除Retrofit，和WebView的缓存
 
 
 
