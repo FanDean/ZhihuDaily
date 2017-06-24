@@ -20,7 +20,9 @@ import android.widget.ProgressBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fandean.zhihudaily.R;
+import com.fandean.zhihudaily.bean.Collection;
 import com.fandean.zhihudaily.bean.DoubanMovie;
+import com.fandean.zhihudaily.util.DbUtil;
 import com.fandean.zhihudaily.util.HttpUtil;
 import com.fandean.zhihudaily.util.MyApiEndpointInterface;
 
@@ -32,6 +34,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+
+import static com.fandean.zhihudaily.util.HttpUtil.DOUBSN_BASE_URL;
 
 public class DoubanActivity extends AppCompatActivity {
     private static final String EXTRA_ID = "com.fandean.zhihudaily.douban_id";
@@ -52,12 +56,14 @@ public class DoubanActivity extends AppCompatActivity {
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
 
-    private String mId;
+    private int mId;
     private String mImageUrl;
     private String mTitle = "豆瓣电影";
 
     private Retrofit mRetrofit;
     private MyApiEndpointInterface mClient;
+    private Collection mCollection = new Collection();
+    private boolean sIsCollected;
 
 
     @Override
@@ -70,7 +76,7 @@ public class DoubanActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (!TextUtils.isEmpty(intent.getStringExtra(EXTRA_TITLE))){
-            mId = intent.getStringExtra(EXTRA_ID);
+            mId = intent.getIntExtra(EXTRA_ID,0);
             mImageUrl = intent.getStringExtra(EXTRA_IMAGE_URL);
             mTitle = intent.getStringExtra(EXTRA_TITLE);
         }
@@ -80,6 +86,19 @@ public class DoubanActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mContentImage);
 
+        mCollection.setId(mId);
+        mCollection.setTitel(mTitle);
+        mCollection.setType(Collection.DOUBN);
+        mCollection.setImageurl(mImageUrl);
+        mCollection.setUrl(DOUBSN_BASE_URL);
+
+        if (sIsCollected = DbUtil.isCollection(MainActivity.mdb,mId)){
+//            mFab.setImageState();
+            mFab.setImageResource(R.drawable.ic_star_cor_white_200);
+            Log.d(MainActivity.FAN_DEAN,"已经收藏");
+        }
+
+
         mClient = HttpUtil.getRetrofitClient(this,HttpUtil.DOUBSN_BASE_URL);
 
         setupWebView();
@@ -87,8 +106,23 @@ public class DoubanActivity extends AppCompatActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (sIsCollected){
+                    //取消收藏
+                    mFab.setImageResource(R.drawable.ic_star_cor_grey_200);
+                    //从数据库中删除
+                    DbUtil.deleteCollection(MainActivity.mdb,mId);
+                    sIsCollected = false;
+                    Snackbar.make(view, "取消收藏", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                } else {
+                    mFab.setImageResource(R.drawable.ic_star_cor_white_200);
+                    //插入数据库
+                    DbUtil.insertCollection(MainActivity.mdb,mCollection);
+                    sIsCollected = true;
+                    Snackbar.make(view, "收藏成功", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                }
+
             }
         });
     }
@@ -102,7 +136,7 @@ public class DoubanActivity extends AppCompatActivity {
 
     private void fetchDoubanMovie(){
         //创建接口实例
-        Call<DoubanMovie> call = mClient.getDoubanMovie(Integer.parseInt(mId));
+        Call<DoubanMovie> call = mClient.getDoubanMovie(mId);
         call.enqueue(new Callback<DoubanMovie>() {
             @Override
             public void onResponse(Call<DoubanMovie> call, Response<DoubanMovie> response) {
@@ -132,7 +166,7 @@ public class DoubanActivity extends AppCompatActivity {
 
 
 
-    public static Intent newIntent(Context context, String id, String imageUrl,String title) {
+    public static Intent newIntent(Context context, int id, String imageUrl,String title) {
         Intent i = new Intent(context, DoubanActivity.class);
         i.putExtra(EXTRA_ID, id);
         i.putExtra(EXTRA_IMAGE_URL, imageUrl);

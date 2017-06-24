@@ -54,7 +54,7 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:fabSize="mini"
-        app:srcCompat="@drawable/ic_star_cor_white_200"/>
+        app:srcCompat="@drawable/has_been_collected"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

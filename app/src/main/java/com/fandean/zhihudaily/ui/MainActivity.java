@@ -1,10 +1,13 @@
 package com.fandean.zhihudaily.ui;
 
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -18,6 +21,7 @@ import android.view.View;
 
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.adapter.ViewPagerAdapter;
+import com.fandean.zhihudaily.db.MyBaseHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,7 +52,11 @@ public class MainActivity extends AppCompatActivity
     private DoubanFragment mDoubanFragment;
     private FragmentManager mFragmentManager;
 
-//    private SQLiteDatabase mdb;
+
+
+    public static SQLiteDatabase mdb;
+    private FragmentManager mManager;
+    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +66,7 @@ public class MainActivity extends AppCompatActivity
         mToolbarMain = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbarMain);
 
-//        mdb = new MyBaseHelper(this).getWritableDatabase();
+        mdb = new MyBaseHelper(this).getWritableDatabase();
 
         mFabMain = (FloatingActionButton) findViewById(R.id.fab_main);
         mFabMain.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +79,11 @@ public class MainActivity extends AppCompatActivity
                 dialog.show(manager,DIALOG_DATE); //tag
             }
         });
+
+//        //用于收藏夹
+//        mManager = getSupportFragmentManager();
+//        mFragment = mManager.findFragmentById(R.id.coordinator_main);
+
 
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -166,7 +179,17 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             // 选择知乎标签页进行显示
+            TabLayout.Tab tab = mTabLayout.getTabAt(0);
+            tab.select();
         } else if (id == R.id.nav_bookmarks) {
+//            if (mFragment == null){
+//                mFragment = new CollectionFragment();
+//                mManager.beginTransaction()
+//                        .replace(R.id.coordinator_main,mFragment)
+//                        .commit();
+//            }
+            Intent intent = new Intent(this,CollectionActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_setting) {
 

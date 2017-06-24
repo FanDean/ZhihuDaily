@@ -33,6 +33,8 @@ public class MyBaseHelper extends SQLiteOpenHelper {
     //在使用ZhihuBaseHelper对象调用get****Database()方法时如果数据库没有创建，则调用onCreate()方法
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+/*
         db.execSQL("create table " + ZhihuNewsDbSchema.ZhihuNewses.NAME + "(" +
 //                        ZhihuNewsDbSchema.ZhihuNewses.Cols.ID + "integer primary key autoincrement" +
                         ZhihuNewsDbSchema.ZhihuNewses.Cols.CREATETIME + " integer primary key," +
@@ -48,19 +50,18 @@ public class MyBaseHelper extends SQLiteOpenHelper {
                 ZhihuNewsDbSchema.ZhihuStories.Cols.JSON + " blob" +
                 ")"
         );
+*/
 
 
         db.execSQL("create table " + ZhihuNewsDbSchema.Favorites.NAME + "(" +
-                ZhihuNewsDbSchema.Favorites.Cols.ID + " integer primary key," +
-                        ZhihuNewsDbSchema.Favorites.Cols.TYPE + " integer," +
-                        ZhihuNewsDbSchema.Favorites.Cols.URL + "," +
-                        ZhihuNewsDbSchema.Favorites.Cols.TITEL+ "," +
-                        ZhihuNewsDbSchema.Favorites.Cols.IMAGEURL +
-                        ")"
+                ZhihuNewsDbSchema.Favorites.Cols.ID + " integer primary key autoincrement," +
+                ZhihuNewsDbSchema.Favorites.Cols.CONTENT_ID + " integer," +
+                ZhihuNewsDbSchema.Favorites.Cols.TYPE + " integer," +
+                ZhihuNewsDbSchema.Favorites.Cols.URL + "," +
+                ZhihuNewsDbSchema.Favorites.Cols.TITEL+ "," +
+                ZhihuNewsDbSchema.Favorites.Cols.IMAGEURL +
+                ")"
         );
-
-        //TODO 创建豆瓣的表
-
 
 
     }

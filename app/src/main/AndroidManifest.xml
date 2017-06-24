@@ -34,6 +34,10 @@
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".ui.CollectionActivity"
+            android:parentActivityName=".ui.MainActivity">
+        </activity>
     </application>
 
 </manifest>

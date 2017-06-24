@@ -6,13 +6,13 @@ package com.fandean.zhihudaily.bean;
  */
 
 public class Collection {
-    public static final int ZHIHU = 0;
-    public static final int DOUBN = 1;
+    public static final boolean ZHIHU = true; //1
+    public static final boolean DOUBN = false; //0
 
     //值知乎或豆瓣对应的id值
-    private String id;
+    private int id;
     //int类型 0代表知乎，1代表豆瓣
-    private int type;
+    private boolean type;
     //详细信息的url，用于跳转到详情页面
     private String url;
     //以下为显示信息
@@ -22,21 +22,22 @@ public class Collection {
     private String imageurl;
 
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public int getType() {
+    public boolean getType() {
         return type;
     }
 
     public void setType(int type) {
-        this.type = type;
+        this.type = type==1;
     }
+    public void setType(boolean type){this.type = type;}
 
     public String getUrl() {
         return url;

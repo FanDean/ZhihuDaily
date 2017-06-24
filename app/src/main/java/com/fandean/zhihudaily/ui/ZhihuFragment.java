@@ -20,7 +20,6 @@ import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.adapter.ZhihuAdapter;
 import com.fandean.zhihudaily.bean.ZhihuNews;
 import com.fandean.zhihudaily.db.MyBaseHelper;
-import com.fandean.zhihudaily.db.ZhihuNewsLab;
 import com.fandean.zhihudaily.util.DateUtil;
 import com.fandean.zhihudaily.util.HttpUtil;
 import com.fandean.zhihudaily.util.MyApiEndpointInterface;
@@ -167,8 +166,8 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private void refreshSuccess(ZhihuNews zhihuNews) {
         //保存刷新的时间
-        GregorianCalendar calendar = new GregorianCalendar();
-        ZhihuNewsLab.get(getActivity()).setRefreshTime(calendar.getTimeInMillis());
+//        GregorianCalendar calendar = new GregorianCalendar();
+//        ZhihuNewsLab.get(getActivity()).setRefreshTime(calendar.getTimeInMillis());
 
 
         mAdapter.clear();
@@ -177,7 +176,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         //停止刷新
         mRefreshLayout.setRefreshing(false);
 
-        ZhihuNewsLab.setBaseTime(GregorianCalendar.getInstance().getTimeInMillis());
+//        ZhihuNewsLab.setBaseTime(GregorianCalendar.getInstance().getTimeInMillis());
         //插入到数据库
         //        mZhihuNewsLab.insertZhihuNews(zhihuNews);
 //        DbUtil.insertZhihuNews(mdb,zhihuNews);
@@ -191,7 +190,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
      */
     private void fetchBeforZhihuNews(int offset){
         GregorianCalendar todayCalendar = new GregorianCalendar();
-        todayCalendar.setTimeInMillis(ZhihuNewsLab.get(getActivity()).getBaseTime());
+//        todayCalendar.setTimeInMillis(ZhihuNewsLab.get(getActivity()).getBaseTime());
         todayCalendar.add(Calendar.DAY_OF_MONTH,-offset);
         String date = DateUtil.calendarToStr(todayCalendar,DateUtil.ZHIHU_DATA_FORMAT);
 
@@ -284,7 +283,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 Log.d(FAN_DEAN, "点击了fab，日期为： " + zhihuNews.getDate());
 
                 mRefreshLayout.setRefreshing(false);
-                ZhihuNewsLab.setBaseTime(calendar.getTimeInMillis());
+//                ZhihuNewsLab.setBaseTime(calendar.getTimeInMillis());
             }
 
             @Override

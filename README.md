@@ -36,6 +36,9 @@ viewpager.setOnPageChangeListener()，从而使得在你应用中如果想监听
 RecyclerView设置分隔线：可以给Item的布局去设置margin，当然了这种方式不够优雅，
 我们文章开始说了，我们可以自由的去定制它，当然我们的分割线也是可以定制的。
 
+
+
+
 ## FloatingActionButton
 
 |||
@@ -727,6 +730,36 @@ HTML页面对应的JS代码：
 
 
 
+## TabLayout
+
+在代码中设置选中某tab：
+
+
+
+```
+TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+TabLayout.Tab tab = tabLayout.getTabAt(someIndex);
+tab.select();
+```
+
+```
+void selectPage(int pageIndex){
+    tabLayout.setScrollPosition(pageIndex,0f,true);
+    viewPager.setCurrentItem(pageIndex);
+}
+```
+
+
+Fragment无法替换Activity中的视图。
+
+[使用返回和向上导航 | Android Developers](https://developer.android.com/design/patterns/navigation.html?hl=zh-cn#into-your-app "使用返回和向上导航 | Android Developers")
+
+[可绘制对象资源 | Android Developers](https://developer.android.com/guide/topics/resources/drawable-resource.html#StateList "可绘制对象资源 | Android Developers")
+
+drawable
+
+
+
 
 
 
@@ -741,7 +774,7 @@ HTML页面对应的JS代码：
 
 ~~豆瓣列表的分页读取，每次读取显示10个项目。~~ 略，因为实现了网络缓存。
 
-WebView加载css
+~~WebView加载css~~
 
 设置界面功能：
 

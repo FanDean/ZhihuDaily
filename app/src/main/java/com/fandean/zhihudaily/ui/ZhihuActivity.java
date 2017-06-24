@@ -20,7 +20,9 @@ import android.widget.ProgressBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fandean.zhihudaily.R;
+import com.fandean.zhihudaily.bean.Collection;
 import com.fandean.zhihudaily.bean.ZhihuStory;
+import com.fandean.zhihudaily.util.DbUtil;
 import com.fandean.zhihudaily.util.HttpUtil;
 import com.fandean.zhihudaily.util.MyApiEndpointInterface;
 
@@ -33,6 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.fandean.zhihudaily.R.id.fab;
+import static com.fandean.zhihudaily.util.HttpUtil.ZHIHU_BASE_URL;
 
 public class ZhihuActivity extends AppCompatActivity {
     private static final String EXTRA_ID = "com.fandean.zhihudaily.newid";
@@ -55,8 +58,10 @@ public class ZhihuActivity extends AppCompatActivity {
     private int mId;
     private String mTitle = "知乎日报";
     private String mImageUrl;
+    private Collection mCollection = new Collection();
 
     private MyApiEndpointInterface mClient;
+    private static boolean sIsCollected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +79,22 @@ public class ZhihuActivity extends AppCompatActivity {
             mTitle = intent.getStringExtra(EXTRA_TITLE);
             mImageUrl = intent.getStringExtra(EXTRA_IMAGE_URL);
         }
+        mCollection.setId(mId);
+        mCollection.setTitel(mTitle);
+        mCollection.setType(Collection.ZHIHU);
+        mCollection.setImageurl(mImageUrl);
+        mCollection.setUrl(ZHIHU_BASE_URL);
+
         mToolbarLayout.setTitle(mTitle);
         Glide.with(this)
                 .load(mImageUrl)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(mImageView);
-
+        if (sIsCollected = DbUtil.isCollection(MainActivity.mdb,mId)){
+//            mFab.setImageState();
+            mFab.setImageResource(R.drawable.ic_star_cor_white_200);
+            Log.d(MainActivity.FAN_DEAN,"已经收藏");
+        }
 
         mClient = HttpUtil.getRetrofitClient(this,HttpUtil.ZHIHU_BASE_URL);
 
@@ -90,8 +105,23 @@ public class ZhihuActivity extends AppCompatActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (sIsCollected){
+                    //取消收藏
+                    mFab.setImageResource(R.drawable.ic_star_cor_grey_200);
+                    //从数据库中删除
+                    DbUtil.deleteCollection(MainActivity.mdb,mId);
+                    sIsCollected = false;
+                    Snackbar.make(view, "取消收藏", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                } else {
+                    mFab.setImageResource(R.drawable.ic_star_cor_white_200);
+                    //插入数据库
+                    DbUtil.insertCollection(MainActivity.mdb,mCollection);
+                    sIsCollected = true;
+                    Snackbar.make(view, "收藏成功", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                }
+
             }
         });
     }
@@ -125,6 +155,7 @@ public class ZhihuActivity extends AppCompatActivity {
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(mImageView);
                 String htmlData = story.getBody();
+
 
 
 
