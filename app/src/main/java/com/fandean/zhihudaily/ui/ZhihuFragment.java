@@ -75,6 +75,8 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mUnbinder = ButterKnife.bind(this,view);
 
         mdb = new MyBaseHelper(getActivity()).getWritableDatabase();
+        //通过设置retainInstance属性为true，来保留fragment实例
+        setRetainInstance(true);
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(manager);

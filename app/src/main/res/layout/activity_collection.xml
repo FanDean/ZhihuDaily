@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/collection_recyclerView"
-    android:name="com.fandean.testactivity.ui.ItemFragment"
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context="com.fandean.zhihudaily.ui.MainActivity"
-    tools:listitem="@layout/collection_item"/>
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/collection_toolbar"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:layout_height="?attr/actionBarSize"/>
+
+    <!-- 使用 android: 命名空间无效的 就用 app命名空间 -->
+    <!--app:theme="@style/AppTheme"-->
+    <!--android:background="?attr/colorPrimary"-->
+    <!-- 无效 -->
+    <!--app:titleTextColor="@android:color/white"-->
+    <!--app:homeAsUpIndicator="@drawable/ic_back_white"-->
+    <!--android:theme="@style/AppTheme.NoActionBar" 为什么无效？-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/collection_recyclerView"
+        android:name="com.fandean.zhihudaily.ui.CollectionActivity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.fandean.zhihudaily.ui.CollectionActivity"
+        tools:listitem="@layout/collection_item"/>
+
+</LinearLayout>

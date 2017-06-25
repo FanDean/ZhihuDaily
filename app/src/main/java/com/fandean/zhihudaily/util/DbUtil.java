@@ -117,9 +117,10 @@ public class DbUtil {
     }
 
     public static CollectionCursorWrapper queryCollection(SQLiteDatabase db,String where,String[] whereArg){
-        //排序，id递减
+        //排序，id递减 order by id desc
         Cursor cursor =   db.query(ZhihuNewsDbSchema.Favorites.NAME,
-                null, where, whereArg, null, null, null);
+                null, where, whereArg, null, null,
+                        ZhihuNewsDbSchema.Favorites.Cols.ID + " desc");
         return new CollectionCursorWrapper(cursor);
     }
 

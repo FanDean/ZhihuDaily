@@ -64,7 +64,8 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
         View view = inflater.inflate(R.layout.fragment_douban, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-
+        //通过设置retainInstance属性为true，来保留fragment实例
+        setRetainInstance(true);
         mClient = HttpUtil.getRetrofitClient(getActivity(),HttpUtil.DOUBSN_BASE_URL);
 
 

@@ -15,7 +15,7 @@
           String str = new String(jsonBytes,Charset.forName("UTF-8"));
   ```
 - 缓存问题。头疼。
-- 定义field变量， private SQLiteDatabase mdb = new MyBaseHelper(this).getWritableDatabase();并且直接初始化。
+- 定义field变量， `private SQLiteDatabase mdb = new MyBaseHelper(this).getWritableDatabase();`并且直接初始化。
 程序异常退出，因为此时传入的this（即当前Activity）还未创建。
 - 从豆瓣列表中打开的Activity中返回到知乎日报列表后知乎Fragment中的列表变空，并且刷新失效，
 但可以通过按返回键退出程序，再次进入时可以重新显示知乎列表。
@@ -257,7 +257,7 @@ SwipeRefreshLayout 也可放在 CoordinatorLayout 内共同处理滑动冲突，
 TODO CardView的点击效果还没有实现。
 
 由于之前为CardView和Image设置了如下两项，但又没有为它们设置监听器，
-所以截获了点击，点击无法传递给底部的LineaLayout。
+所以截获了点击事件，点击无法传递给底部的LineaLayout。
 ```
 android:clickable="true"
 android:focusable="true"
@@ -280,7 +280,6 @@ todayCalendar.get(Calendar.YEAR);
 //获取到的月份是没有前导0的，并且是从0开始算起，比如6月它返回的是5，而不是05或6或06。
 todayCalendar.get(Calendar.MONTH);
 todayCalendar.get(Calendar.DAY_OF_MONTH);
-
 ```
 
 
@@ -327,6 +326,45 @@ isViewFromObject()方法的具体实现： （一行代码）
 Activity类提供了管理菜单的回到函数。 **需要选项菜单时，**Android会调用Activity的onCreateOptionMenu(Menu)方法。
 
 
+## toolbar
+
+```
+        //替换actionbar，为toolbar，
+        //对Toolbar的修改必须要在替换actionbar方法之前, 否则会导致某些属性修改无效, 例如setTitle()标题设置
+        setSupportActionBar(mToolbarMain);
+```
+
+关于替不替换actionbar有什么区别: 系统默认会对actionbar有一些操作方法,例如默认对actionbar显示了应用名称,
+如果执行了替换actionbar方法, 即使不给toolbar设置标题,系统也会默认加个应用名称作为标题
+
+
+### Toolbar和菜单
+
+分两种情况：
+
+1、当替换了Actionbar
+
+创建菜单文件，重写创建菜单方法；和创建默认菜单方式一样。
+
+2、没有替换Actionbar
+
+`mToolbar.inflateMenu(R.menu.toolbar_inflat_menu);`
+
+
+如果需要不显示菜单：
+可以移除该方法或直接返回false
+```
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        //对返回值的描述：You must return true for the menu to be displayed; if you return false it will not be shown.
+//        return true;
+        //如果需要不显示菜单，可以移除该方法或直接返回false
+        return false;
+    }
+```
+
 
 ### Fragment中的菜单
 
@@ -369,6 +407,25 @@ android:parentActivityName=".ui.MainActivity"
 层级导航，重建父Activity的问题。而按返回键不会。
 
 
+解决办法之一：
+
+取消Manifest文件中指定的父Activity， `android:parentActivityName=".ui.MainActivity"`
+
+然后在代码中使用如下代码：
+```
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+```
+
+
+
 
 
 ## 对话框
@@ -380,7 +437,114 @@ Dialog并非通过启动一个新Activity实现。
 建议将AlertDialog封装在DialogFragment**实例**中使用(理解这句话)。这样可以解决设备配置变更的问题。
 
 
-## Activity与Fragment之间的实时通信
+API 21为Activity增加了一个新的属性，只要将其设置成persistAcrossReboots，activity就有了持久化的能力，
+另外需要配合一个新的bundle才行，那就是PersistableBundle。
+
+
+也就是说，下面的两个方法中的Bundle对象的保存并不是持久化的：
+
+```
+protected void onSaveInstanceState(Bundle outState)
+protected void onRestoreInstanceState(Bundle savedInstanceState)
+```
+
+
+持久化保存数据，使用下面的方法，注意观察它们的参数。
+
+```
+@Override
+public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+  super.onCreate(savedInstanceState, persistentState);
+}
+@Override
+public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
+  Debug.i("持久化恢复数据");
+}
+@Override
+public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+  Debug.i("持久化保存数据");
+}
+```
+
+不过默认情况下这三个方法都不会执行, 需要给需要执行的Activity增加一个属性android:persistableMode="persistAcrossReboots"
+
+
+
+## Activity保存数据
+
+[Activity的数据保存与恢复 | 设计师吴彦祖](http://liangjingkanji.coding.me/2017/01/15/ActivityStateSave/ "Activity的数据保存与恢复 | 设计师吴彦祖")
+
+
+默认情况下，系统会使用Bundle对象去保存activity布局中的每个view对象的信息（如刚输入在activity中的文本值）。所以当activity被销毁和重建，布局的状态会自动恢复到之前的状态。
+但是如果你的activity需要恢复更多的信息，比如成员变量信息，则需要自己动手写了。
+
+
+
+
+
+## Fragment
+
+两个Fragment之间的通信，设置目标Fragment，调用目标Fragment的onActivityResult()方法。
+没错Fragment中也有onActivityResult(),见[文档](https://developer.android.com/reference/android/app/Fragment.html#onActivityResult)
+
+ startActivityForResult(Intent, int)
+
+见项目中与日期选择相关的实现。
+
+
+setArguments(Bundle args)
+
+
+### Fragment数据保存和恢复
+
+保存使用：
+```
+onSaveInstanceState(Bundle outState)
+```
+
+恢复数据重写以下方法：
+```
+void onCreate (Bundle savedInstanceState)
+void onActivityCreated (Bundle savedInstanceState)
+```
+
+
+> 在横竖屏切换或者Activity重建时, Activity其依附的Fragment也会同样的销毁重建.
+一般会在AndroidManifest的Activity标签中加入属性`android:configChanges="orientation"`禁止重新创建.
+
+该方法在《Android编程权威指南》中在讲解如何保存WebView数据时的相关章节有介绍，
+意思应该是自己实现配置变更为水平时自己处理（此时Activity不会重启）
+
+> 该属性表示，设置不触发生命周期 `android:configChanges="keyboardHidden|screenSize|orientation"`
+> 属性值依次代表 键盘隐藏|屏幕尺寸|屏幕方向. 设置以后这三种变化都不会触发生命周期.
+
+### Fragment对象保存和恢复
+
+**Fragment对象**保存和恢复
+
+#### Fragment的非中断保存setRetainInstance：
+
+主要用来保存大量数据。
+
+如果想叫自己的Fragment即使在其Activity重做时也不进行销毁那么就要设置setRetainInstance(true)。
+进行了这样的操作后，一旦发生Activity重组现象，Fragment会跳过onDestroy直接进行onDetach（界面消失、对象还在），
+而Framgnet重组时候也会跳过onCreate，而onAttach和onActivityCreated还是会被调用。需要注意的是，
+要使用这种操作的Fragment不能加入backstack后退栈中。并且，被保存的Fragment实例不会保持太久，
+若长时间没有容器承载它，也会被系统回收掉的。
+
+void setRetainInstance (boolean retain)
+
+boolean getRetainInstance();
+
+[Fragment的非中断保存setRetaineInstance | 小蒋的博客](http://www.jiangwenrou.com/fragment%E7%9A%84%E9%9D%9E%E4%B8%AD%E6%96%AD%E4%BF%9D%E5%AD%98setretaineinstance.html "Fragment的非中断保存setRetaineInstance | 小蒋的博客")
+
+
+
+> 另见《Android权威编程指南》第319页，三种不同的生命周期的对比： Activity对象、被保留的fragment、Activity的记录（包括使用onSaveInstanceState(Bundle)方法保存的记录）
+
+
+
+### Activity与Fragment之间的实时通信
 
 之前了解的都是在Activity或Fragment在创建或销毁时传递数据的方法，现在要考虑在创建之后如何进行通信。
 
@@ -406,6 +570,26 @@ TextViewtextView=(TextView) getActivity().findViewById(R.id.main_tv);
 textView.setText("呵呵呵呵呵呵呵");
 ```
 
+利用回调接口：
+
+
+
+> 过渡动画、添加到返回栈
+
+隐藏和显示Fragment：
+
+- FragmentTransaction hide (Fragment fragment)
+- FragmentTransaction show (Fragment fragment)
+
+替换容器：
+
+容器即Avtivity上的布局控件, 必须是ViewGroup的子类。容器只是作为占位符，提供一个空间供Fragment显示视图，
+但是Fragment无法覆盖里面现有的View；所以容器中不应有其他View。
+
+Fragment无法替换（覆盖）Activity中的视图。
+
+
+## Dialog对话框
 
 AlertDialog.Builder. 属于构造器模式用法
 
@@ -729,6 +913,12 @@ HTML页面对应的JS代码：
 ```
 
 
+## Sqlite
+
+回顾数据库知识：  [SQLite 教程](http://www.runoob.com/sqlite/sqlite-tutorial.html "SQLite 教程 | 菜鸟教程")
+
+
+
 
 ## TabLayout
 
@@ -750,13 +940,54 @@ void selectPage(int pageIndex){
 ```
 
 
-Fragment无法替换Activity中的视图。
+
 
 [使用返回和向上导航 | Android Developers](https://developer.android.com/design/patterns/navigation.html?hl=zh-cn#into-your-app "使用返回和向上导航 | Android Developers")
 
 [可绘制对象资源 | Android Developers](https://developer.android.com/guide/topics/resources/drawable-resource.html#StateList "可绘制对象资源 | Android Developers")
 
 drawable
+
+
+## 测试 removeAllViews()
+
+Whats difference between removeAllViews() and removeAllViewsInLayout()
+
+[android - Whats difference between removeAllViews() and removeAllViewsInLayout() - Stack Overflow](https://stackoverflow.com/questions/11952598/whats-difference-between-removeallviews-and-removeallviewsinlayout "android - Whats difference between removeAllViews() and removeAllViewsInLayout() - Stack Overflow")
+
+
+removeAllViews() : -Call this method to remove all child views from the ViewGroup.
+
+removeAllViewsInLayout() : -Called by a ViewGroup subclass to remove child views from itself,
+when it must first know its size on screen before it can calculate how many child views it will render.
+
+所以在有些情况下，removeAllViews()能移除掉子视图，但removeAllviewsInLayout()移除不掉，因为子视图还未计算。
+
+
+Fragment无法替换Activity中的视图。
+
+
+[重写setContentView实现多个Activity部分UI布局相同 - 泡在网上的日子](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/0331/1608.html "重写setContentView实现多个Activity部分UI布局相同 - 泡在网上的日子")
+
+
+## Style和Theme
+
+toolbar设置主题：
+
+```xml
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/collection_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"/>
+
+        <!-- 由于没有添加 android:background="?attr/colorPrimary" 上面的toolbar背景色为白色。 -->
+        <!-- 但是添加了这一行后，字体颜色居然成了黑色 -->
+        <!-- 使用 android: 命名空间无效的 就用 app命名空间 -->
+```
+
+
+
+
 
 
 
@@ -766,19 +997,24 @@ drawable
 ## TODO
 ~~TODO CardView的点击效果还没有实现。~~
 
-配置变更后，回到之前的列表位置。
+~~设备配置变更后，回到之前的列表位置~~。暂时使用保留fragment对象的方法解决。
 
-层级导航，重建Activity问题
+~~层级导航，重建Activity问题~~
 
-收藏夹排序问题，数据表中添加自动增长的主键，读取时倒序读取，并在读取时考虑使用分页读取。
+~~收藏夹排序问题，数据表中添加自动增长的主键，读取时倒序读取，~~ 并在读取时考虑使用分页读取。
 
 ~~豆瓣列表的分页读取，每次读取显示10个项目。~~ 略，因为实现了网络缓存。
 
 ~~WebView加载css~~
+
+TabLayout在水平布局时，两个tab紧靠在一起。
 
 设置界面功能：
 
 - 删除缓存功能：删除Retrofit，和WebView的缓存
 
 
+夜间模式
+toolbar主题设置
 
+加入高德地图的定位功能。[示例中心 | 高德开放平台](http://lbs.amap.com/dev/demo "示例中心 | 高德开放平台")

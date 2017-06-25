@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mToolbarMain = (Toolbar) findViewById(R.id.toolbar_main);
+        //替换actionbar，为toolbar，
+        //对Toolbar的修改必须要在替换actionbar方法之前, 否则会导致某些属性修改无效, 例如setTitle()标题设置
         setSupportActionBar(mToolbarMain);
 
         mdb = new MyBaseHelper(this).getWritableDatabase();
@@ -100,6 +103,11 @@ public class MainActivity extends AppCompatActivity
 
         //经常性，由于xml中使用是非支持库版本的TabLayout而导致这里转换出错
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        //由于没有创建水平布局，在这里设置一下标签页（但是没用）
+        //显示模式固定
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
+        //对齐方式填满
+        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         mTabLayout.setupWithViewPager(mViewpager);
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -109,6 +117,7 @@ public class MainActivity extends AppCompatActivity
                     //隐藏并不保留View所占用的空间
                     mFabMain.setVisibility(View.GONE);
                 }
+                Log.d(FAN_DEAN,"TabLayout.getTabGravity(): GRAVITY_FILL = 0；" + mTabLayout.getTabGravity());
             }
 
             @Override
@@ -153,19 +162,23 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        //对返回值的描述：You must return true for the menu to be displayed; if you return false it will not be shown.
+//        return true;
+        //如果需要不显示菜单，可以移除该方法或直接返回false
+        return false;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if (id == android.R.id.home){
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -174,7 +187,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
