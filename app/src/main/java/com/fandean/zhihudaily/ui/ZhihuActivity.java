@@ -18,8 +18,8 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.bean.Collection;
 import com.fandean.zhihudaily.bean.ZhihuStory;
@@ -87,10 +87,10 @@ public class ZhihuActivity extends AppCompatActivity {
         mCollection.setUrl(ZHIHU_BASE_URL);
 
         mToolbarLayout.setTitle(mTitle);
-        Glide.with(this)
-                .load(mImageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(mImageView);
+//        Glide.with(this)
+//                .load(mImageUrl)
+//                .into(mImageView);
+//
         if (sIsCollected = DbUtil.isCollection(MainActivity.mdb,mId)){
 //            mFab.setImageState();
             mFab.setImageResource(R.drawable.ic_star_cor_white_200);
@@ -151,9 +151,15 @@ public class ZhihuActivity extends AppCompatActivity {
                 }
                 ZhihuStory story = response.body();
 
+                //优化用户体验，使用Glide的高级略缩图形式
+                DrawableRequestBuilder<String> thumbnailRequest = Glide
+                        .with(ZhihuActivity.this)
+                        .load(mImageUrl);
+
                 Glide.with(ZhihuActivity.this)
                         .load(story.getImage())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                        .diskCacheStrategy(DiskCacheStrategy.ALL) //默认
+                        .thumbnail(thumbnailRequest)
                         .into(mImageView);
                 String htmlData = story.getBody();
 

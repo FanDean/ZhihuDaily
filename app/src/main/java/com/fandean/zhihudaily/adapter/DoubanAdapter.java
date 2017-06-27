@@ -99,7 +99,7 @@ public class DoubanAdapter extends RecyclerView.Adapter<DoubanAdapter.DoubanHold
             Glide.with(mContext)
                     .load(mSubjectsBean.getImages().getLarge())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .thumbnail(0.5f)
+                    .thumbnail(0.1f)
                     .into(mMovieImageview);
         }
 

@@ -123,7 +123,6 @@ public class DoubanActivity extends AppCompatActivity {
                     Snackbar.make(view, "收藏成功", Snackbar.LENGTH_SHORT)
                             .setAction("Action", null).show();
                 }
-
             }
         });
     }

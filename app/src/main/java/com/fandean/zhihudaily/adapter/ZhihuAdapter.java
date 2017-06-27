@@ -94,7 +94,7 @@ public class ZhihuAdapter extends RecyclerView.Adapter<ZhihuAdapter.ZhihuHolder>
                     //Glide 4.0.0中已经不能直接使用此方法
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     //加载缩略图时应用于目标尺寸的乘数。看doc
-                    .thumbnail(0.5f)
+                    .thumbnail(0.1f)
                     .into(mImageView);
         }
 

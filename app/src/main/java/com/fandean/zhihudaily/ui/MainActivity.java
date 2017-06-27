@@ -15,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -115,9 +114,9 @@ public class MainActivity extends AppCompatActivity
                 //当tab被选中时
                 if (tab.getPosition() == 0){
                     //隐藏并不保留View所占用的空间
-                    mFabMain.setVisibility(View.GONE);
+                    mFabMain.setVisibility(View.VISIBLE);
                 }
-                Log.d(FAN_DEAN,"TabLayout.getTabGravity(): GRAVITY_FILL = 0；" + mTabLayout.getTabGravity());
+//                Log.d(FAN_DEAN,"TabLayout.getTabGravity(): GRAVITY_FILL = 0；" + mTabLayout.getTabGravity());
             }
 
             @Override
