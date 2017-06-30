@@ -48,4 +48,4 @@ TabLayout在水平布局时，两个tab紧靠在一起。
 
 toolbar主题设置
 
-加入高德地图的定位功能。[示例中心 | 高德开放平台](http://lbs.amap.com/dev/demo "示例中心 | 高德开放平台")
+- [x] 加入高德地图的定位功能。[示例中心 | 高德开放平台](http://lbs.amap.com/dev/demo "示例中心 | 高德开放平台")

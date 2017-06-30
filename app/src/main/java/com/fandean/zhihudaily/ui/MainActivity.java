@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
     public static final String FAN_DEAN = "知乎Daily： FanDean";
+    //定位得到的城市，默认为北京
+    public static String sCity = "北京";
 
     @BindView(R.id.toolbar_main)
     Toolbar mToolbarMain;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -218,4 +221,5 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }
