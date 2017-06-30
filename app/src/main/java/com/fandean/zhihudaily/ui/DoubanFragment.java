@@ -2,6 +2,8 @@ package com.fandean.zhihudaily.ui;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.adapter.DoubanAdapter;
 import com.fandean.zhihudaily.bean.DoubanMovieInTheaters;
@@ -52,9 +58,60 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private DoubanAdapter mAdapter;
 
+
+    //定位服务类
+    //AMapLocationClient是定位*服务*类，可以启动定位、停止定位以及销毁定位
+    private AMapLocationClient mAMapLocationClient;
+    //定位参数
+    private AMapLocationClientOption mAMapLocationClientOption;
+    private CoordinatorLayout mCoordinatorLayout;
+    //定位得到的城市，默认为北京
+    public static String sCity = "北京";
+
     public DoubanFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //高德定位
+        //初始化定位
+        mAMapLocationClient = new AMapLocationClient(getActivity().getApplicationContext());
+        mAMapLocationClient.setLocationListener(new AMapLocationListener() {
+            //获取定位结果
+            @Override
+            public void onLocationChanged(AMapLocation aMapLocation) {
+                if (aMapLocation != null){
+                    if (aMapLocation.getErrorCode() == 0){
+                        sCity = aMapLocation.getCity().replace("市","");
+                        //刷新界面
+                        //将会一直在后台获取位置，可进行优化
+                        Log.d(FAN_DEAN,"当前城市 sCity = " + sCity);
+                        //成功获取位置后，停止定位
+                        mAMapLocationClient.stopLocation();
+                    } else {
+                        Toast.makeText(getActivity(), "定位失败， ErroCode: " +
+                                        + aMapLocation.getErrorCode() + ", errInfo: "
+                                        + aMapLocation.getErrorInfo()
+                                , Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+
+        //定位参数设置
+        mAMapLocationClientOption = new AMapLocationClientOption();
+        //省电模式的定位，（不需要，高准确性）
+        mAMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
+        mAMapLocationClient.setLocationOption(mAMapLocationClientOption);
+        //调用方法startLocation()后，开始异步获取定位数据
+        mAMapLocationClient.startLocation();
+        //之后还需在onDestroy()方法中进行销毁操作
+    }
+
 
 
     @Override
@@ -100,7 +157,8 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void fetchDoubanMovieList(){
         //city=北京&start=0&count=100
         Map<String,String> queryMap = new HashMap<>();
-        queryMap.put("city","北京");
+        queryMap.put("city",sCity);
+//        queryMap.put("city","北京");
         queryMap.put("start","0");
         queryMap.put("count","100");
         Call<DoubanMovieInTheaters> call = mClient.getDoubanMovieInTheaters(queryMap);
@@ -157,5 +215,15 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         fetchDoubanMovieList();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mAMapLocationClient != null){
+            mAMapLocationClient.onDestroy();
+            mAMapLocationClient = null;
+            mAMapLocationClientOption = null;
+        }
     }
 }

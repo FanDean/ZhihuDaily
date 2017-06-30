@@ -193,10 +193,10 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private void fetchBeforZhihuNews(int offset){
         GregorianCalendar todayCalendar = new GregorianCalendar();
 //        todayCalendar.setTimeInMillis(ZhihuNewsLab.get(getActivity()).getBaseTime());
-        todayCalendar.add(Calendar.DAY_OF_MONTH,-offset);
+        todayCalendar.add(Calendar.DAY_OF_MONTH,-offset + 1);//因为日期为20170630获取的数据是29的
         String date = DateUtil.calendarToStr(todayCalendar,DateUtil.ZHIHU_DATA_FORMAT);
 
-        Log.d(FAN_DEAN, "往日知乎日报，日期： " + date);
+        Log.d(FAN_DEAN, "往日知乎日报，日期： " + date + "\n偏移量offset：" + offset);
 
         Call<ZhihuNews> call = mClient.getBeforeZhihuNews(Integer.parseInt(date));
 
@@ -217,7 +217,8 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 int preSize = mStoriesBeanList.size();
                 mStoriesBeanList.addAll(zhihuNews.getStories());
 
-                mAdapter.notifyItemRangeInserted(preSize, zhihuNews.getStories().size());
+//                mAdapter.notifyItemRangeInserted(preSize, zhihuNews.getStories().size());
+                mAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             }
 
@@ -254,6 +255,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 //                    + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH));
             //改变了日期，则刷新
             if(calendar.compareTo(GregorianCalendar.getInstance()) != 0) {
+                calendar.add(Calendar.DAY_OF_MONTH,1);
                 fetchBeforZhihuNews(calendar);
             }
         }
