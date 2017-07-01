@@ -3,10 +3,7 @@ package com.fandean.zhihudaily.ui;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-<<<<<<< HEAD
 import android.preference.PreferenceManager;
-=======
->>>>>>> f477568e5b8d660e8dd1795cbd770c78dde47e07
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -44,6 +41,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -64,17 +63,6 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private DoubanAdapter mAdapter;
     private SharedPreferences mPreferences;
 
-
-    //定位服务类
-    //AMapLocationClient是定位*服务*类，可以启动定位、停止定位以及销毁定位
-    private AMapLocationClient mAMapLocationClient;
-    //定位参数
-    private AMapLocationClientOption mAMapLocationClientOption;
-    private CoordinatorLayout mCoordinatorLayout;
-    //定位得到的城市，默认为北京
-    public static String sCity = "北京";
-
-
     //定位服务类
     //AMapLocationClient是定位*服务*类，可以启动定位、停止定位以及销毁定位
     private AMapLocationClient mAMapLocationClient;
@@ -92,10 +80,9 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-<<<<<<< HEAD
+
         mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-=======
->>>>>>> f477568e5b8d660e8dd1795cbd770c78dde47e07
+
         //高德定位
         //初始化定位
         mAMapLocationClient = new AMapLocationClient(getActivity().getApplicationContext());
@@ -106,10 +93,9 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (aMapLocation != null){
                     if (aMapLocation.getErrorCode() == 0){
                         sCity = aMapLocation.getCity().replace("市","");
-<<<<<<< HEAD
+
                         mPreferences.edit().putString(getString(R.string.pref_city_key),sCity).apply();
-=======
->>>>>>> f477568e5b8d660e8dd1795cbd770c78dde47e07
+
                         //刷新界面
                         //将会一直在后台获取位置，可进行优化
                         Log.d(FAN_DEAN,"当前城市 sCity = " + sCity);
@@ -134,11 +120,9 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
         //调用方法startLocation()后，开始异步获取定位数据
         mAMapLocationClient.startLocation();
         //之后还需在onDestroy()方法中进行销毁操作
-<<<<<<< HEAD
 
         COLUMN = Integer.parseInt(mPreferences.getString(getString(R.string.pref_movie_key), "2"));
-=======
->>>>>>> f477568e5b8d660e8dd1795cbd770c78dde47e07
+
     }
 
 
