@@ -13,9 +13,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<<<<<<< HEAD
     <!-- 用于写入缓存数据到扩展存储卡 -->
     <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
     <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
+=======
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
+
+>>>>>>> f477568e5b8d660e8dd1795cbd770c78dde47e07
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -57,6 +62,15 @@
 
         <activity android:name=".ui.SettingsActivity">
         </activity>
+
+        <!-- 高德地图相关SDK -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="1cf628ea69d259dc77193647d7b4f4fa">
+        </meta-data>
+        <!-- 声明定位service -->
+        <service android:name="com.amap.api.location.APSService"/>
+
     </application>
 
 </manifest>
