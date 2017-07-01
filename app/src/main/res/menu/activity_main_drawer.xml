@@ -14,10 +14,7 @@
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_menu_settings_black_24dp"
             android:title="@string/nav_setting"/>
-        <item
-            android:id="@+id/nav_share"
-            android:icon="@drawable/ic_menu_share"
-            android:title="@string/nav_share"/>
+
     </group>
 
     <item android:title="@string/nav_items_title">
@@ -26,8 +23,12 @@
                 android:id="@+id/nav_style"
                 android:title="@string/nav_style"/>
             <item
-                android:id="@+id/nav_about"
-                android:title="@string/nav_about"/>
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/nav_share"/>
+            <!--<item-->
+                <!--android:id="@+id/nav_about"-->
+                <!--android:title="@string/nav_about"/>-->
         </menu>
     </item>
 

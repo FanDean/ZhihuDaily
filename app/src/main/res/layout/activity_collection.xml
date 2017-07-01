@@ -3,23 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/collection_toolbar"
         android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:layout_height="?attr/actionBarSize"/>
-
-    <!-- 使用 android: 命名空间无效的 就用 app命名空间 -->
-    <!--app:theme="@style/AppTheme"-->
-    <!--android:background="?attr/colorPrimary"-->
-    <!-- 无效 -->
-    <!--app:titleTextColor="@android:color/white"-->
-    <!--app:homeAsUpIndicator="@drawable/ic_back_white"-->
-    <!--android:theme="@style/AppTheme.NoActionBar" 为什么无效？-->
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/collection_recyclerView"

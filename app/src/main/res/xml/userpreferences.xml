@@ -1,0 +1,59 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="设置">
+        <Preference
+            android:defaultValue="北京"
+            android:key="city"
+            android:summary="@string/pref_city"
+            android:title="@string/pref_city_title"/>
+
+        <ListPreference
+            android:defaultValue="2"
+            android:entries="@array/pref_column_count"
+            android:entryValues="@array/pref_column_count_values"
+            android:key="movie_list"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="@string/pref_movie_column"
+            android:title="@string/pref_movie_column_title"/>
+
+        <Preference
+            android:key="clear_cache"
+            android:summary="@string/pref_clear_cache"
+            android:title="@string/pref_clear_cache_title"/>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="关于">
+        <Preference android:title="@string/pref_version_title"
+            android:summary="@string/pref_version"/>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="作者">
+        <Preference android:title="@string/pref_my_homepage_title"
+            android:summary="@string/pref_my_homepage"
+            android:key="homepage">
+            <!--网络浏览器，打开网址，必须使用 VIEW 而非 ACTION_VIEW -->
+            <intent android:action="android.intent.action.VIEW"
+                android:data="@string/pref_my_homepage"/>
+        </Preference>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="支持">
+        <!-- 支持 -->
+        <Preference android:title="@string/pref_feedback"
+            android:key="feedback">
+            //发送email，带多个附件
+            <!--<intent android:action="android.intent.action.SEND_MULTIPLE"-->
+                <!--android:mimeType="text/plain"-->
+                <!--android:data="fandean@outlook.com"/>-->
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

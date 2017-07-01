@@ -73,7 +73,9 @@ public class DoubanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_zhihu);
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Intent intent = getIntent();
         if (!TextUtils.isEmpty(intent.getStringExtra(EXTRA_TITLE))){
@@ -131,6 +133,7 @@ public class DoubanActivity extends AppCompatActivity {
         WebSettings webSettings = mWebview.getSettings();
         //支持JS
         webSettings.setJavaScriptEnabled(true);
+//        mWebview.clearCache(true);
         fetchDoubanMovie();
     }
 
@@ -168,6 +171,9 @@ public class DoubanActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         if (id == android.R.id.home){
+            //调用该方法
+//            onBackPressed();
+            //或者finish
             finish();
         }
         return super.onOptionsItemSelected(item);

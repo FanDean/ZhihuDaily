@@ -23,7 +23,7 @@ public class HttpUtil {
     public static final String LOG_TAG = "知乎Daily:Okhttp3 log ->";
     public static final String DOUBSN_BASE_URL = "https://api.douban.com/v2/movie/";
     public static final String ZHIHU_BASE_URL = "https://news-at.zhihu.com/api/4/news/";
-
+    public static final String OKHTTP_CACHE_DIR_NAME = "zhihudailyokhttp3cache";
 
 
 
@@ -32,8 +32,9 @@ public class HttpUtil {
         Retrofit mRetrofit;
         OkHttpClient mOkHttpClient;
         //1. 设置缓存路径。或者使用 getCacheDir()
-        File httpCacheDirectory = new File(context.getExternalCacheDir(), "zhihuDailyCache");
-        //设置缓存 10M
+//        File httpCacheDirectory = new File(context.getExternalCacheDir(), OKHTTP_CACHE_DIR_NAME);
+        File httpCacheDirectory = new File(context.getCacheDir(), OKHTTP_CACHE_DIR_NAME);
+        //设置缓存 10M，如果超过此大小，OkHttp3将会使用相应算法进行清除
         Cache cache = new Cache(httpCacheDirectory, 10 * 1024 * 1024);
 
         //以匿名内部类的形式，实现过滤器，并在该过滤器中同时进行重写请求和重写响应

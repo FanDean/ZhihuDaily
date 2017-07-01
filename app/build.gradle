@@ -37,4 +37,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.amap.api:location:latest.integration'
+    compile 'com.android.support:preference-v7:25.3.1'
 }

@@ -14,6 +14,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.bean.DoubanMovieInTheaters;
 import com.fandean.zhihudaily.ui.DoubanActivity;
+import com.fandean.zhihudaily.ui.MainActivity;
 
 import java.util.List;
 
@@ -87,7 +88,18 @@ public class DoubanAdapter extends RecyclerView.Adapter<DoubanAdapter.DoubanHold
             itemView.setOnClickListener(this);
         }
 
+        private void changeImageHeight() {
+            //TODO 弄清除问题的原因
+            //mMovieImageview.getLayoutParams().height = (int)( mMovieImageview.getWidth() * 1.5);
+            mMovieImageview.getLayoutParams().height = (int)( itemView.getWidth() * 1.5);
+            Log.d(MainActivity.FAN_DEAN, "宽度：" + mMovieImageview.getWidth()
+                    + "高度: " + mMovieImageview.getHeight());
+        }
+
         public void bindSubjectsBean(DoubanMovieInTheaters.SubjectsBean subjectsBean){
+            //更改ImageView的高度
+//            changeImageHeight();
+
             mSubjectsBean = subjectsBean;
             mMovieTitle.setText(mSubjectsBean.getTitle());
 //            mRatingBar.setRating((float) mSubjectsBean.getRating().getAverage());

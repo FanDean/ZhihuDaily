@@ -1,0 +1,81 @@
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="设置">
+        <android.support.v7.preference.SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="ations"
+            android:title="ni"/>
+
+        <android.support.v7.preference.ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/pref_column_count"
+            android:entryValues="@array/pref_column_count_values"
+            android:key="example_list"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="pref_title_add_friends_to_messages"/>
+
+        <android.support.v7.preference.SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="ations"
+            android:title="ni"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="关于">
+        <android.support.v7.preference.SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="ations"
+            android:title="ni"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="作者">
+        <android.support.v7.preference.SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="ations"
+            android:title="ni"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="支持">
+        <android.support.v7.preference.SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="ations"
+            android:title="ni"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <android.support.v7.preference.EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="name"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="ni"/>
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+
+
+    <!-- 支持 -->
+    <android.support.v7.preference.Preference android:title="sync_settings">
+        <intent android:action="android.settings.SYNC_SETTINGS"/>
+    </android.support.v7.preference.Preference>
+
+</android.support.v7.preference.PreferenceScreen>

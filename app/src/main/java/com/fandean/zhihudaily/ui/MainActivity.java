@@ -207,14 +207,16 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_setting) {
-
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_style) {
             //设置夜间模式
-        } else if (id == R.id.nav_about) {
-            //关于本程序
         }
+//        else if (id == R.id.nav_about) {
+//            //关于本程序
+//        }
 
         //统一在此关闭抽屉
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

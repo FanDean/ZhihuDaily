@@ -27,6 +27,40 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_douban">DoubanActivity</string>
+
+    <!--以下String 用于 设置界面-->
+    <string name="pref_city_title">当前定位的城市</string>
+    <string name="pref_city">北京</string>
+    <string name="pref_city_key">city</string>
+
+    <string name="pref_movie_column_title">电影显示的列数</string>
+    <string name="pref_movie_column">2</string>
+    <string name="pref_movie_key">movie_list</string>
+
+    <string name="pref_clear_cache_title">清除缓存</string>
+    <string name="pref_clear_cache">清除应用程序缓存的图片等数据</string>
+    <string name="pref_clear_cache_key">clear_cache</string>
+
+    <string name="pref_version_title">版本</string>
+    <string name="pref_version">1.0.0</string>
+    <string name="pref_my_homepage_title">个人主页</string>
+    <string name="pref_my_homepage">https://github.com/fandean/</string>
+    <string name="pref_my_homepage_key">homepage</string>
+
+    <string name="pref_feedback">反馈Bug/建议</string>
+    <string name="pref_feedback_key">feedback</string>
+    <string name="pref_feedback_email">mailto:fandean@outlook.com</string>
+
+    <string-array name="pref_column_count">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="pref_column_count_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

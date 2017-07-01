@@ -1,7 +1,9 @@
 package com.fandean.zhihudaily.ui;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -50,13 +52,14 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @BindView(R.id.douban_swiprefresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
     Unbinder unbinder;
-    private final int COLUMN = 2;
+    private static int COLUMN = 2;
 
     private DoubanMovieInTheaters mMovieInTheaters;
     private List<DoubanMovieInTheaters.SubjectsBean> mMovieSubjects = new ArrayList<>();
     private MyApiEndpointInterface mClient;
 
     private DoubanAdapter mAdapter;
+    private SharedPreferences mPreferences;
 
 
     //定位服务类
@@ -76,6 +79,7 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //高德定位
         //初始化定位
         mAMapLocationClient = new AMapLocationClient(getActivity().getApplicationContext());
@@ -86,6 +90,7 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (aMapLocation != null){
                     if (aMapLocation.getErrorCode() == 0){
                         sCity = aMapLocation.getCity().replace("市","");
+                        mPreferences.edit().putString(getString(R.string.pref_city_key),sCity).apply();
                         //刷新界面
                         //将会一直在后台获取位置，可进行优化
                         Log.d(FAN_DEAN,"当前城市 sCity = " + sCity);
@@ -110,6 +115,8 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
         //调用方法startLocation()后，开始异步获取定位数据
         mAMapLocationClient.startLocation();
         //之后还需在onDestroy()方法中进行销毁操作
+
+        COLUMN = Integer.parseInt(mPreferences.getString(getString(R.string.pref_movie_key), "2"));
     }
 
 
