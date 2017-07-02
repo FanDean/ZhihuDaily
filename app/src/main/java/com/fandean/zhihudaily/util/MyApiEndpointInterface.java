@@ -49,7 +49,7 @@ public interface MyApiEndpointInterface {
     //1小时
     @Headers("Cache-Control: public, max-age=3600")
     @GET("before/{date}")
-    Call<ZhihuNews> getBeforeZhihuNews(@Path("date") int date);
+    Call<ZhihuNews> getBeforeZhihuNews(@Path("date") String date);
 
     //豆瓣
     //baseUrl: https://api.douban.com/v2/movie/

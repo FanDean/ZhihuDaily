@@ -136,7 +136,8 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         //通过设置retainInstance属性为true，来保留fragment实例
         setRetainInstance(true);
-        mClient = HttpUtil.getRetrofitClient(getActivity(),HttpUtil.DOUBSN_BASE_URL);
+        mClient = HttpUtil.getRetrofitClient(getActivity().getApplicationContext(),
+                HttpUtil.DOUBSN_BASE_URL);
 
 
         mAdapter = new DoubanAdapter(mMovieSubjects,getActivity());

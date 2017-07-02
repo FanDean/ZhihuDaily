@@ -36,6 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.fandean.zhihudaily.R.id.fab;
+import static com.fandean.zhihudaily.ui.MainActivity.FAN_DEAN;
 import static com.fandean.zhihudaily.util.HttpUtil.ZHIHU_BASE_URL;
 
 public class ZhihuActivity extends AppCompatActivity {
@@ -62,7 +63,11 @@ public class ZhihuActivity extends AppCompatActivity {
     private Collection mCollection = new Collection();
 
     private MyApiEndpointInterface mClient;
+    //是否已经收藏
     private static boolean sIsCollected = false;
+    //
+//    private SharedPreferences mPreferences;
+//    private static boolean isNightTheme = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +76,12 @@ public class ZhihuActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+//        mPreferences = getSharedPreferences(NIGHT_PREFERENCE_FILE_NAME,MODE_PRIVATE);
+//        isNightTheme = mPreferences.getBoolean(NIGHT_PREFERENCE_KEY,false);
 
         //获取传入的数据，设置标题、加载头部图片、mId用于获取新闻
         Intent intent = getIntent();
@@ -151,24 +161,33 @@ public class ZhihuActivity extends AppCompatActivity {
                 }
                 ZhihuStory story = response.body();
 
+
                 //优化用户体验，使用Glide的高级略缩图形式
                 DrawableRequestBuilder<String> thumbnailRequest = Glide
-                        .with(ZhihuActivity.this)
+//                        .with(ZhihuActivity.this)
+                        .with(getApplicationContext())
                         .load(mImageUrl);
 
-                Glide.with(ZhihuActivity.this)
+                Glide
+//                        .with(ZhihuActivity.this)
+                        .with(getApplicationContext())
                         .load(story.getImage())
-//                        .diskCacheStrategy(DiskCacheStrategy.ALL) //默认
                         .thumbnail(thumbnailRequest)
                         .into(mImageView);
-                String htmlData = story.getBody();
+                String htmlBody = story.getBody();
 
-
-
-
-                htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"zhihu_daily.css\" />" + htmlData;
                 // lets assume we have /assets/style.css file
-                mWebview.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+                String css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"zhihu_daily.css\" />";
+
+                if (MainActivity.isNightTheme){ //应用夜间模式配色
+                    String html = "<html><head>" + css + "</head><body class=\"night\">" + htmlBody  + "</body></html>";
+                    Log.d(FAN_DEAN,"夜间模式：\n");
+                    mWebview.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+                } else { //使用正常配色
+                    String html = "<html><head>" + css + "</head><body>" + htmlBody + "</body></html>";
+                    Log.d(FAN_DEAN,"正常模式：\n");
+                    mWebview.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+                }
 
 
                 //使用该方法加载中文页面会乱码
@@ -197,7 +216,13 @@ public class ZhihuActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static Intent newIntent(Context pakageContext, int id,String title,String imageUrl) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    public static Intent newIntent(Context pakageContext, int id, String title, String imageUrl) {
         Intent i = new Intent(pakageContext, ZhihuActivity.class);
         i.putExtra(EXTRA_ID, id);
         i.putExtra(EXTRA_TITLE,title);

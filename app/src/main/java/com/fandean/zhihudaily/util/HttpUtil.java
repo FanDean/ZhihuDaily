@@ -33,7 +33,9 @@ public class HttpUtil {
         OkHttpClient mOkHttpClient;
         //1. 设置缓存路径。或者使用 getCacheDir()
 //        File httpCacheDirectory = new File(context.getExternalCacheDir(), OKHTTP_CACHE_DIR_NAME);
+//        File httpCacheDirectory = new File(context.getCacheDir(), OKHTTP_CACHE_DIR_NAME);
         File httpCacheDirectory = new File(context.getCacheDir(), OKHTTP_CACHE_DIR_NAME);
+
         //设置缓存 10M，如果超过此大小，OkHttp3将会使用相应算法进行清除
         Cache cache = new Cache(httpCacheDirectory, 10 * 1024 * 1024);
 

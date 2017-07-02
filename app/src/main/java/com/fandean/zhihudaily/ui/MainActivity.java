@@ -1,19 +1,20 @@
 package com.fandean.zhihudaily.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import android.view.View;
 import com.fandean.zhihudaily.R;
 import com.fandean.zhihudaily.adapter.ViewPagerAdapter;
 import com.fandean.zhihudaily.db.MyBaseHelper;
+import com.fandean.zhihudaily.util.Utility;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,9 +32,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
+    public static final String NIGHT_PREFERENCE_FILE_NAME = "night.preference.file.name";
+    public static final String NIGHT_PREFERENCE_KEY = "night_preference_key";
+    public static SQLiteDatabase mdb;
     public static final String FAN_DEAN = "知乎Daily： FanDean";
-    //定位得到的城市，默认为北京
-    public static String sCity = "北京";
+    public static boolean isNightTheme = false;
 
     @BindView(R.id.toolbar_main)
     Toolbar mToolbarMain;
@@ -55,14 +59,10 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager mFragmentManager;
 
 
-
-    public static SQLiteDatabase mdb;
-    private FragmentManager mManager;
-    private Fragment mFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setTheme();
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mToolbarMain = (Toolbar) findViewById(R.id.toolbar_main);
@@ -83,11 +83,6 @@ public class MainActivity extends AppCompatActivity
                 dialog.show(manager,DIALOG_DATE); //tag
             }
         });
-
-//        //用于收藏夹
-//        mManager = getSupportFragmentManager();
-//        mFragment = mManager.findFragmentById(R.id.coordinator_main);
-
 
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -186,7 +181,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
@@ -197,31 +191,41 @@ public class MainActivity extends AppCompatActivity
             TabLayout.Tab tab = mTabLayout.getTabAt(0);
             tab.select();
         } else if (id == R.id.nav_bookmarks) {
-//            if (mFragment == null){
-//                mFragment = new CollectionFragment();
-//                mManager.beginTransaction()
-//                        .replace(R.id.coordinator_main,mFragment)
-//                        .commit();
-//            }
+            //打开收藏夹
             Intent intent = new Intent(this,CollectionActivity.class);
             startActivity(intent);
-
         } else if (id == R.id.nav_setting) {
+            //打开设置界面
             Intent i = new Intent(this, SettingsActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_share) {
-
+            Utility.shareApp(this);
         } else if (id == R.id.nav_style) {
-            //设置夜间模式
+            setTheme();
+            //重建Activity，使主题生效
+            this.recreate();
         }
-//        else if (id == R.id.nav_about) {
-//            //关于本程序
-//        }
 
         //统一在此关闭抽屉
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setTheme() {
+        SharedPreferences preferences = getSharedPreferences(NIGHT_PREFERENCE_FILE_NAME,MODE_PRIVATE);
+        isNightTheme = preferences.getBoolean(NIGHT_PREFERENCE_KEY,false);
+        if (isNightTheme){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else {
+            //设置夜间模式
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+
+        isNightTheme = !isNightTheme;
+        preferences.edit().putBoolean(NIGHT_PREFERENCE_KEY,isNightTheme).apply();
+        //设置动画优化过度界面
+//            getWindow().setWindowAnimations(R.style.Window);
     }
 
 }

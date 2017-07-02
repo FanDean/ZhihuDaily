@@ -27,7 +27,6 @@ import com.fandean.zhihudaily.util.NetworkState;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,23 +43,18 @@ import retrofit2.Retrofit;
 public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private static final int REQUEST_DATE = 0;
     public static final String FAN_DEAN = MainActivity.FAN_DEAN;
-    private  long mRefreshTimeInterval = 0;
 
     @BindView(R.id.zhihu_swiprefresh) SwipeRefreshLayout mRefreshLayout;
     @BindView(R.id.zhihu_recyclerview) RecyclerView mRecyclerView;
     Unbinder mUnbinder;
     private ZhihuAdapter mAdapter;
-//    private ZhihuNewsLab mZhihuNewsLab;
     private List<ZhihuNews> mZhihuNewsList = new ArrayList<>();
     private List<ZhihuNews.StoriesBean> mStoriesBeanList = new ArrayList<>();
     private SQLiteDatabase mdb;
-
-    //Retrofit REST Client:
-    //Retrofit类是基础，通过Builder对象来设置某些参数，然后通过build()方法来生成Retrofit对象
-    Retrofit mRetrofit;
-    //创建接口的实例
     MyApiEndpointInterface mClient;
 
+    private static String sLatestDate = DateUtil.getCurrentTimeString(DateUtil.ZHIHU_DATE_FORMAT);
+    private static String sOldDate = sLatestDate;
 
     public ZhihuFragment() {
         // Required empty public constructor。为什么？
@@ -95,7 +88,8 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mRecyclerView.setAdapter(mAdapter);
 
 
-        mClient = HttpUtil.getRetrofitClient(getActivity(),HttpUtil.ZHIHU_BASE_URL);
+        mClient = HttpUtil.getRetrofitClient(getActivity().getApplicationContext(),
+                HttpUtil.ZHIHU_BASE_URL);
 
 
         //设置颜色
@@ -122,7 +116,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
      */
     private void fetchLatestZhihuNews() {
         mRefreshLayout.setRefreshing(true);
-
+        Log.d(FAN_DEAN, "latest mclient: " + mClient.toString());
         Call<ZhihuNews> call = mClient.getLatestZhihuNews();
 
         call.enqueue(new Callback<ZhihuNews>() {
@@ -141,10 +135,14 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 }
 
                 ZhihuNews zhihuNews = response.body();
-
                 //刷新成功
-                Log.d(FAN_DEAN, "刷新数据：" + zhihuNews.getDate());
-                refreshSuccess(zhihuNews);
+                Log.d(FAN_DEAN, "获取最新知乎数据：" + zhihuNews.getDate());
+                mAdapter.clear();
+                mAdapter.addAll(zhihuNews.getStories());
+                //停止刷新
+                mRefreshLayout.setRefreshing(false);
+                sLatestDate = DateUtil.getCurrentTimeString(DateUtil.ZHIHU_DATE_FORMAT);
+                sOldDate = sLatestDate;
             }
 
             @Override
@@ -155,6 +153,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         });
     }
 
+    //刷新失败
     private void refreshFail(){
         NetworkState state = new NetworkState(getActivity());
         if (state.isNetWorkConnected()){
@@ -166,39 +165,70 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mRefreshLayout.setRefreshing(false);
     }
 
-    private void refreshSuccess(ZhihuNews zhihuNews) {
-        //保存刷新的时间
-//        GregorianCalendar calendar = new GregorianCalendar();
-//        ZhihuNewsLab.get(getActivity()).setRefreshTime(calendar.getTimeInMillis());
 
+    /*
+     * 下拉，获取非最新日期
+     */
+    private void fetchAfterZhihuNews(){
+        mRefreshLayout.setRefreshing(true);
+        Call<ZhihuNews> call = mClient.getBeforeZhihuNews(DateUtil.dateOnePlus(sLatestDate));
 
-        mAdapter.clear();
-        mAdapter.addAll(zhihuNews.getStories());
+        call.enqueue(new Callback<ZhihuNews>() {
+            //以下两个方法已经回到UI线程中执行
+            @Override
+            public void onResponse(Call<ZhihuNews> call, Response<ZhihuNews> response) {
+                //onResponse总是会被调用，需进行如下判断
+                if (response.body() == null) {
+                    try {
+                        Log.e(FAN_DEAN,response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    refreshFail();
+                    return;
+                }
 
-        //停止刷新
-        mRefreshLayout.setRefreshing(false);
+                ZhihuNews zhihuNews = response.body();
 
-//        ZhihuNewsLab.setBaseTime(GregorianCalendar.getInstance().getTimeInMillis());
-        //插入到数据库
-        //        mZhihuNewsLab.insertZhihuNews(zhihuNews);
-//        DbUtil.insertZhihuNews(mdb,zhihuNews);
+                mAdapter.insertAllToFirst(zhihuNews.getStories());
+                //滚动列表，垂直方向下移90
+//                mRecyclerView.scrollBy(0,90);
+                //只有LinearLayoutManager才可
+//                LinearLayoutManager linearLayoutManager=
+//                (LinearLayoutManager)mRecyclerView.getLayoutManager();
+//                int last = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+//                int first = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+////                mRecyclerView.scrollToPosition(last);
+                int size = zhihuNews.getStories().size();
+                mRecyclerView.scrollToPosition(size-2);
+                //下拉要保证 sLatestDate 递增
+                Log.d(FAN_DEAN,"下拉： sLatestDate = " + sLatestDate  + "  返回的数据中的日期: " + zhihuNews.getDate());
+                sLatestDate = DateUtil.dateOnePlus(sLatestDate);
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<ZhihuNews> call, Throwable t) {
+                //call在这里又有何用，Throwable 如何使用
+                refreshFail();
+            }
+        });
     }
 
+
+
     /**
+     * 上拉
      * 获取往日知乎日报，传入相对于当天的偏移量
      * （注意：在每天0点的时候，当天可能并没有数据产生，获取的数据可能是昨天的）
      * 上拉：附加数据到链表，并提示数据更新
      * offset为正数
      */
     private void fetchBeforZhihuNews(int offset){
-        GregorianCalendar todayCalendar = new GregorianCalendar();
-//        todayCalendar.setTimeInMillis(ZhihuNewsLab.get(getActivity()).getBaseTime());
-        todayCalendar.add(Calendar.DAY_OF_MONTH,-offset + 1);//因为日期为20170630获取的数据是29的
-        String date = DateUtil.calendarToStr(todayCalendar,DateUtil.ZHIHU_DATA_FORMAT);
+        String date = sOldDate;
+        Log.d(FAN_DEAN, "往日知乎日报，日期： " + date + " -1天\n偏移量offset：" + offset);
 
-        Log.d(FAN_DEAN, "往日知乎日报，日期： " + date + "\n偏移量offset：" + offset);
-
-        Call<ZhihuNews> call = mClient.getBeforeZhihuNews(Integer.parseInt(date));
+        Call<ZhihuNews> call = mClient.getBeforeZhihuNews(date);
 
         call.enqueue(new Callback<ZhihuNews>() {
             @Override
@@ -214,11 +244,9 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 }
                 ZhihuNews zhihuNews = response.body();
 
-                int preSize = mStoriesBeanList.size();
-                mStoriesBeanList.addAll(zhihuNews.getStories());
-
-//                mAdapter.notifyItemRangeInserted(preSize, zhihuNews.getStories().size());
-                mAdapter.notifyDataSetChanged();
+                mAdapter.appendAll(zhihuNews.getStories());
+                //更新时间
+                sOldDate = zhihuNews.getDate();
                 mRefreshLayout.setRefreshing(false);
             }
 
@@ -240,41 +268,59 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onRefresh() {
-        fetchLatestZhihuNews();
+        if (sLatestDate.equals(DateUtil.getCurrentTimeString(DateUtil.ZHIHU_DATE_FORMAT))){
+            fetchLatestZhihuNews();
+            Log.d(FAN_DEAN,"下拉获取最新数据");
+        } else {
+            Log.d(FAN_DEAN,"下拉获取往日数据");
+            fetchAfterZhihuNews();
+        }
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK)return;
+        if (resultCode != Activity.RESULT_OK) return;
 
         if (requestCode == REQUEST_DATE){
             GregorianCalendar calendar = (GregorianCalendar) data.getSerializableExtra(DatePicerFragment.EXTRA_DATE);
-//            Log.d("FanDean", "从DatePicer获取到的日期： "
-//                    + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH));
-            //改变了日期，则刷新
-            if(calendar.compareTo(GregorianCalendar.getInstance()) != 0) {
-                calendar.add(Calendar.DAY_OF_MONTH,1);
-                fetchBeforZhihuNews(calendar);
-            }
+            fetchBeforZhihuNews(calendar);
         }
     }
 
 
+    /**
+     *  获取某日的知乎数据
+     *  清除当前List
+     *  更新两个全局变量
+     */
+    private void fetchBeforZhihuNews(final GregorianCalendar calendar) {
+        final String dateStr = DateUtil.calendarToStr(calendar, DateUtil.ZHIHU_DATE_FORMAT);
+        Log.d(FAN_DEAN, "DataPicer选择的日期：" + dateStr);
+        //如果选择的是当天
+        if (calendar.compareTo(GregorianCalendar.getInstance()) == 0){
+                //获取最新数据
+                fetchLatestZhihuNews();
+                return;
+            }
 
-    private void fetchBeforZhihuNews(final GregorianCalendar calendar){
+            //改变主题，重建Activity后，点击选择日期，mClient居然会变为null
+        if (mClient == null){
+//                mClient = HttpUtil.getRetrofitClient(getActivity(),
+//                        HttpUtil.ZHIHU_BASE_URL);
+                return;
+            }
+        Log.d(FAN_DEAN, "mclient: " + mClient.toString());
 
-        String date = DateUtil.calendarToStr(calendar,DateUtil.ZHIHU_DATA_FORMAT);
-        Log.d(FAN_DEAN,"转换过的日期：" + Integer.parseInt(date));
-        Call<ZhihuNews> call = mClient.getBeforeZhihuNews(Integer.parseInt(date));
+        Call<ZhihuNews> call = mClient.getBeforeZhihuNews(DateUtil.dateOnePlus(dateStr));
 
         call.enqueue(new Callback<ZhihuNews>() {
             @Override
             public void onResponse(Call<ZhihuNews> call, Response<ZhihuNews> response) {
                 if (response.body() == null) {
                     try {
-                        Log.e(FAN_DEAN,response.errorBody().string());
+                        Log.e(FAN_DEAN, response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -284,10 +330,9 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 ZhihuNews zhihuNews = response.body();
                 mAdapter.clear();
                 mAdapter.addAll(zhihuNews.getStories());
-                Log.d(FAN_DEAN, "点击了fab，日期为： " + zhihuNews.getDate());
-
+                sLatestDate = DateUtil.dateOnePlus(zhihuNews.getDate());
+                sOldDate = dateStr;
                 mRefreshLayout.setRefreshing(false);
-//                ZhihuNewsLab.setBaseTime(calendar.getTimeInMillis());
             }
 
             @Override
@@ -295,6 +340,7 @@ public class ZhihuFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 refreshFail();
             }
         });
+//    }
     }
 
 }

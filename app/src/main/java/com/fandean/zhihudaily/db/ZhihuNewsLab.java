@@ -69,7 +69,7 @@ package com.fandean.zhihudaily.db;
 //    public List<ZhihuNews> getZhihuNewsList(){
 //        List<ZhihuNews> zhihuNewsList = new ArrayList<>();
 //        //TODO: 数据库插入Json的问题
-//        ZhihuNews zhihuNews = getZhihuNews(DateUtil.getCurrentTimeString(DateUtil.ZHIHU_DATA_FORMAT));
+//        ZhihuNews zhihuNews = getZhihuNews(DateUtil.getCurrentTimeString(DateUtil.ZHIHU_DATE_FORMAT));
 //        if (zhihuNews == null) return null;
 //        zhihuNewsList.add(zhihuNews);
 //        return zhihuNewsList;

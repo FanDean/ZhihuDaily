@@ -70,6 +70,17 @@ public class ZhihuAdapter extends RecyclerView.Adapter<ZhihuAdapter.ZhihuHolder>
         notifyDataSetChanged();
     }
 
+    public void insertAllToFirst(List<ZhihuNews.StoriesBean> storiesList){
+        mStoriesList.addAll(0,storiesList);
+        notifyItemRangeInserted(0,storiesList.size());
+    }
+
+    public void appendAll(List<ZhihuNews.StoriesBean> storiesList){
+        int size = mStoriesList.size();
+        mStoriesList.addAll(storiesList); //默认应该就是追加
+        notifyItemRangeInserted(size,storiesList.size());
+    }
+
 
 
     public class ZhihuHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

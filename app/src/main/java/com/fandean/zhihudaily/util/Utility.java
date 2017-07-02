@@ -1,6 +1,7 @@
 package com.fandean.zhihudaily.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -47,6 +48,22 @@ public class Utility {
             //没过期
             return false;
         }
+    }
+
+    //分享App，同时分析文字和图片
+    public static void shareApp(Context context){
+        String msg = "给大家介绍一个看新闻的APP，ZhihuDaily";
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+//        Uri uri = Uri.parse("https://github.com/FanDean/ZhihuDaily/raw/master/pictures/ZhihuDaily.jpg");
+//        Uri uri = resourceIdToUri(context,R.drawable.ic_zhi);
+//        share.putExtra(Intent.EXTRA_STREAM,uri);
+//        share.setType("image/*");
+        share.setType("text/plain");
+        //当用户选择短信时使用 sms_body 取得文字
+        share.putExtra("sms_body",msg);
+        share.putExtra(Intent.EXTRA_TEXT,msg);
+        //自定义选择框的标题
+        context.startActivity(Intent.createChooser(share, "邀请好友"));
     }
 
 }

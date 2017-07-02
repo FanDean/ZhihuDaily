@@ -18,10 +18,11 @@
     <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
 
     <application
+        android:name=".app.MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_zhi"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_zhi"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity

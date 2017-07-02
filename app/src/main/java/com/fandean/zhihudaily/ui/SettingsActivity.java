@@ -155,9 +155,9 @@ public class SettingsActivity extends AppCompatActivity {
                         intent.putExtra(Intent.EXTRA_SUBJECT, "ZhihuDaily用户反馈");
 
                         intent.putExtra(Intent.EXTRA_TEXT,
-                                "ZhihuDaily用户反馈 \n\n\n\n\n\n\n" + Build.MODEL + "\n"
-                                        + Build.VERSION.RELEASE + "\n"
-                                        + getString(R.string.pref_version));
+                                "ZhihuDaily用户反馈 \n\n\n\n\n\n\n" + "Build.MODEL = " + Build.MODEL + "\n"
+                                        + "Build.VERSION.RELEASE" + Build.VERSION.RELEASE + "\n"
+                                        + "客户端版本：" + getString(R.string.pref_version));
 
                         startActivity(intent);
                     } catch (ActivityNotFoundException ex) {
@@ -248,8 +248,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(getString(R.string.pref_movie_key))) {
-                mMovieListPref.setSummary(sharedPreferences.getString(key, "" + 2));
+            //避免在该Fragment还没有附加到Activity上之前执行下面的语句，而造成异常退出
+            if (isAdded()) {
+                if (key.equals(getString(R.string.pref_movie_key))) {
+                    mMovieListPref.setSummary(sharedPreferences.getString(key, "" + 2));
+                }
             }
         }
     }

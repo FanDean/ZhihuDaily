@@ -2,6 +2,7 @@ package com.fandean.zhihudaily.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -19,7 +20,7 @@ import java.util.GregorianCalendar;
 
 public class DateUtil {
     public static final String CREATTIME_FORMAT = "yyyyMMddHHmmss";
-    public static final String ZHIHU_DATA_FORMAT = "yyyyMMdd";
+    public static final String ZHIHU_DATE_FORMAT = "yyyyMMdd";
 
 
     /*
@@ -64,6 +65,17 @@ public class DateUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 将传入的表示日期的字符串中的日期值加一并返回加一后的值，该日期格式为ZHIHU_DATE_FORMAT
+     * @param dateStr 表示ZHIHU_DATE_FORMAT形式的字符串
+     * @return 加一后的日期字符串
+     */
+    public static String dateOnePlus(String dateStr){
+        GregorianCalendar calendar = stringToCalendar(dateStr,ZHIHU_DATE_FORMAT);
+        calendar.add(Calendar.DAY_OF_MONTH,1);
+        return calendarToStr(calendar,ZHIHU_DATE_FORMAT);
     }
 
 }
