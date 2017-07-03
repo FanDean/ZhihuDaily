@@ -20,6 +20,8 @@
 
 ## 演示
 
+![](./pictures/ZhihuDaily.gif)
+
 
 ![](./pictures/ZhihuDaily.jpg)
 

@@ -107,6 +107,9 @@ public class DoubanFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                         + aMapLocation.getErrorInfo()
                                 , Toast.LENGTH_SHORT).show();
                     }
+                    //定位失败，分析错误代码，停止定位
+                    
+                    mAMapLocationClient.stopLocation();
                 }
             }
         });
